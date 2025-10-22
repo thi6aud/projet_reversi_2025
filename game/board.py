@@ -47,7 +47,7 @@ class Board:
         if self.grid[row][col] != EMPTY:
           continue
 
-        for dr, dc in DIRECTIONS:
+        for (dr, dc) in DIRECTIONS:
           r = row + dr
           c = col + dc
           found_opponent = False
@@ -64,3 +64,26 @@ class Board:
   
   def inside(self, row, col):
     return 0 <= row < 8 and 0 <= col < 8
+  
+  def apply_move(self, row, col, player):
+    if (row, col) in self.get_valid_moves(player):
+      self.grid[row][col] = player
+
+      for (dr, dc) in DIRECTIONS:
+          r = row + dr
+          c = col + dc
+
+          if not self.inside(r, c) or self.grid[r][c] != -player:
+            continue
+
+          while self.inside(r, c) and self.grid[r][c] == -player:
+            r += dr
+            c += dc
+
+          if self.inside(r, c) and self.grid[r][c] == player:
+            r -= dr
+            c -= dc
+            while (r, c) != (row, col):
+              self.grid[r][c] = player
+              r -= dr
+              c -= dc
