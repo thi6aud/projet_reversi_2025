@@ -1,6 +1,5 @@
-from game.board import Board, BLACK
+from game.game_manager import GameManager
 
 if __name__ == "__main__":
-    b = Board()
-    b.display()
-    print("Valid moves for BLACK:", b.get_valid_moves(BLACK))
+    g = GameManager()
+    g.run()
