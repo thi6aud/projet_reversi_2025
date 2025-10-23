@@ -1,3 +1,4 @@
+import random
 from game.board import BLACK, WHITE, EMPTY
 
 class Player:
@@ -39,7 +40,7 @@ class AIPlayer(Player):
     self.depth = depth
 
   def get_move(self, board):
-    valid = board.get_valid_moves(self.color)
-    if not valid:
+    valid_moves = board.get_valid_moves(self.color)
+    if not valid_moves:
       return None
-    return valid[0]
+    return valid_moves[random.randint(0, len(valid_moves) - 1)]
