@@ -1,3 +1,8 @@
+from rich.table import Table
+from rich.console import Console
+from rich import box
+console = Console()
+
 EMPTY = 0
 BLACK = 1
 WHITE = -1
@@ -23,13 +28,28 @@ class Board:
     return black_count, white_count
   
   def display(self):
-    print("  0 1 2 3 4 5 6 7")
+    table = Table(show_header=True, header_style="dim", show_lines=True, box=box.SQUARE)
+    
+    # colonnes A–H
+    table.add_column(" ", justify="center")
+    for c in "ABCDEFGH":
+        table.add_column(c, justify="center")
+
+    # lignes 1–8
     for i, row in enumerate(self.grid):
-      line = ' '.join(self._symbol(cell) for cell in row)
-      print(f"{i} {line}")
+        line = [str(i + 1)]
+        for cell in row:
+            if cell == BLACK:
+                line.append("[black]●[/black]")
+            elif cell == WHITE:
+                line.append("[white]●[/white]")
+            else:
+                line.append("·")
+        table.add_row(*line)
 
     black_count, white_count = self.count_discs()
-    print(f"Black: {black_count}  White: {white_count}")
+    console.print(table)
+    console.print(f"[bold white]Black:[/bold white] {black_count} - [bold white]White:[/bold white] {white_count}")
 
   def _symbol(self, cell):
     if cell == BLACK:

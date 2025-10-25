@@ -1,5 +1,5 @@
-from game.game_manager import GameManager
+from game.board import Board
 
 if __name__ == "__main__":
-    g = GameManager()
-    g.run()
+    b = Board()
+    b.display()
