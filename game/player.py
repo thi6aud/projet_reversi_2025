@@ -43,4 +43,4 @@ class AIPlayer(Player):
     valid_moves = board.get_valid_moves(self.color)
     if not valid_moves:
       return None
-    return valid_moves[random.randint(0, len(valid_moves) - 1)]
+    return random.choice(valid_moves)
