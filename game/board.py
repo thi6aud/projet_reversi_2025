@@ -28,7 +28,7 @@ class Board:
     return black_count, white_count
   
   def display(self):
-    table = Table(show_header=True, header_style="dim", show_lines=True, box=box.SQUARE)
+    table = Table(show_header=True, show_lines=True, box=box.SQUARE)
     
     # colonnes A–H
     table.add_column(" ", justify="center")
@@ -51,14 +51,6 @@ class Board:
     console.print(table)
     console.print(f"[bold white]Black:[/bold white] {black_count} - [bold white]White:[/bold white] {white_count}")
 
-  def _symbol(self, cell):
-    if cell == BLACK:
-      return 'B'
-    elif cell == WHITE:
-      return 'W'
-    else:
-      return '.'
-
   def get_valid_moves(self, player):
     valid_moves = []
 
@@ -77,7 +69,7 @@ class Board:
             c += dc      
           
           if self.inside(r, c) and self.grid[r][c] == player and found_opponent:
-            valid_moves.append((row, col))
+            valid_moves.append((row + 1, chr(col + ord("A"))))
             break
 
     return valid_moves
@@ -86,24 +78,35 @@ class Board:
     return 0 <= row < 8 and 0 <= col < 8
   
   def apply_move(self, row, col, player):
-    if (row, col) in self.get_valid_moves(player):
-      self.grid[row][col] = player
+    col = col.upper()
+    human_move = (row, col)
+    r, c = row - 1, ord(col) - ord("A")
 
-      for (dr, dc) in DIRECTIONS:
-          r = row + dr
-          c = col + dc
+    # Validate using the human-readable form returned by get_valid_moves
+    if human_move not in self.get_valid_moves(player):
+      return  # invalid move; no change
 
-          if not self.inside(r, c) or self.grid[r][c] != -player:
-            continue
+    # Place the disc
+    self.grid[r][c] = player
 
-          while self.inside(r, c) and self.grid[r][c] == -player:
-            r += dr
-            c += dc
+    # Flip in all directions
+    for (dr, dc) in DIRECTIONS:
+      rr = r + dr
+      cc = c + dc
 
-          if self.inside(r, c) and self.grid[r][c] == player:
-            r -= dr
-            c -= dc
-            while (r, c) != (row, col):
-              self.grid[r][c] = player
-              r -= dr
-              c -= dc
+      if not self.inside(rr, cc) or self.grid[rr][cc] != -player:
+        continue
+
+      # Walk over opponent discs
+      while self.inside(rr, cc) and self.grid[rr][cc] == -player:
+        rr += dr
+        cc += dc
+
+      # If we end on our own disc, flip back along the line
+      if self.inside(rr, cc) and self.grid[rr][cc] == player:
+        rr -= dr
+        cc -= dc
+        while (rr, cc) != (r, c):
+          self.grid[rr][cc] = player
+          rr -= dr
+          cc -= dc

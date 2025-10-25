@@ -1,5 +1,6 @@
 from game.board import Board
+from game.game_manager import GameManager
 
 if __name__ == "__main__":
-    b = Board()
-    b.display()
+    gm = GameManager()
+    gm.run()

@@ -12,27 +12,36 @@ class HumanPlayer(Player):
       return None
 
     while True:
-      try:
-        print(f"Valid moves: {valid}")
-        raw = input("Enter your move (row col): ").strip()
-        parts = raw.split()
-        if len(parts) != 2:
-          print("Expected format: two integers separated by a space (e.g. 2 3)")
+      print("Valid moves:", ", ".join([f"{r}{c}" for r, c in valid]))
+      raw = input("Enter your move (row col): ").strip().replace(",", "").replace(" ", "").upper()
+
+      # Handle combined input like "3D"
+      if len(raw) == 2 and raw[0].isdigit() and raw[1].isalpha():
+          row_part, col_part = raw[0], raw[1]
+      elif len(raw) == 3 and raw[:2].isdigit() and raw[2].isalpha():
+          row_part, col_part = raw[:2], raw[2]
+      else:
+          print("Expected format: e.g. 3D or 3 D")
           continue
-        row, col = int(parts[0]), int(parts[1])
-        if not (0 <= row < 8 and 0 <= col < 8):
-          print("Coordinates must be between 0 and 7.")
+
+      # convert row 1–8
+      if not row_part.isdigit() or not (1 <= int(row_part) <= 8):
+          print("Row must be between 1 and 8.")
           continue
-        if (row, col) not in valid:
+      row = int(row_part)
+
+      # convert col A–H
+      if col_part not in "ABCDEFGH":
+          print("Column must be between A–H.")
+          continue
+      col = col_part
+
+      move = (row, col)
+      if move not in valid:
           print("Invalid move. Try again.")
           continue
-        return (row, col)
-      except ValueError:
-        print("Invalid input: please enter two integers (e.g. 2 3)")
-        continue
-      except (KeyboardInterrupt, EOFError):
-        print("\nInterruption detected: skipping turn.")
-        return None
+
+      return move
 
 class AIPlayer(Player):
   def __init__(self, color, depth=1):
