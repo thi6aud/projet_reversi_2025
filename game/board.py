@@ -1,6 +1,7 @@
 from rich.table import Table
 from rich.console import Console
 from rich import box
+
 console = Console()
 
 EMPTY = 0
@@ -13,6 +14,7 @@ DIRECTIONS = [(-1, -1), (-1, 0), (-1, 1),
 
 class Board:
   def __init__(self):
+    # grid[row][col]  -> row/ligne d'abord, col/colonne ensuite
     self.grid = [[EMPTY for _ in range(8)] for _ in range(8)]
     self._init_start_position()
   
@@ -63,33 +65,42 @@ class Board:
           r = row + dr
           c = col + dc
           found_opponent = False
-          while self.inside(r, c) and self.grid[r][c] != EMPTY and self.grid[r][c] == -player:
+
+          while self.inside(r, c) and self.grid[r][c] == -player:
             found_opponent = True
             r += dr
-            c += dc      
-          
+            c += dc
+
           if self.inside(r, c) and self.grid[r][c] == player and found_opponent:
-            valid_moves.append((row + 1, chr(col + ord("A"))))
+            # exposer au format humain (col, row) -> ex: ("D", 3)
+            valid_moves.append((chr(col + ord("A")), row + 1))
             break
 
     return valid_moves
-  
+
   def inside(self, row, col):
     return 0 <= row < 8 and 0 <= col < 8
-  
-  def apply_move(self, row, col, player):
+
+  def apply_move(self, col, row, player):
+    """
+    Reçoit un coup au format humain (col lettre A–H, row 1–8), ex: ('D', 3).
+    À l'intérieur on travaille en (row, col) 0-indexés.
+    """
     col = col.upper()
-    human_move = (row, col)
-    r, c = row - 1, ord(col) - ord("A")
+    human_move = (col, row)
 
-    # Validate using the human-readable form returned by get_valid_moves
+    # Vérifier que le coup est légal au format (col, row)
     if human_move not in self.get_valid_moves(player):
-      return  # invalid move; no change
+      return  # coup invalide; pas de changement
 
-    # Place the disc
+    # Conversion vers indices 0-based (row, col)
+    r = row - 1
+    c = ord(col) - ord("A")
+
+    # Poser le pion
     self.grid[r][c] = player
 
-    # Flip in all directions
+    # Retourner dans toutes les directions (dr, dc)
     for (dr, dc) in DIRECTIONS:
       rr = r + dr
       cc = c + dc
@@ -97,12 +108,12 @@ class Board:
       if not self.inside(rr, cc) or self.grid[rr][cc] != -player:
         continue
 
-      # Walk over opponent discs
+      # Avancer sur les pions adverses
       while self.inside(rr, cc) and self.grid[rr][cc] == -player:
         rr += dr
         cc += dc
 
-      # If we end on our own disc, flip back along the line
+      # Si on retombe sur un de nos pions, on retourne en arrière
       if self.inside(rr, cc) and self.grid[rr][cc] == player:
         rr -= dr
         cc -= dc
