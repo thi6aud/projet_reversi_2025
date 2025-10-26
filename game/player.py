@@ -1,5 +1,4 @@
 import random
-from game.board import BLACK, WHITE, EMPTY
 
 class Player:
   def __init__(self, color):
@@ -18,8 +17,6 @@ class HumanPlayer(Player):
       # Gère une saisie comme "D3"
       if len(raw) == 2 and raw[0].isalpha() and raw[1].isdigit():
           col_part, row_part = raw[0], raw[1]
-      elif len(raw) == 3 and raw[:2].isalpha() and raw[2].isdigit():
-          col_part, row_part = raw[:2], raw[2]
       else:
           print("Expected format: e.g. D3")
           continue
@@ -44,9 +41,8 @@ class HumanPlayer(Player):
       return move
 
 class AIPlayer(Player):
-  def __init__(self, color, depth=1):
+  def __init__(self, color):
     super().__init__(color)
-    self.depth = depth
 
   def get_move(self, board):
     valid_moves = board.get_valid_moves(self.color)

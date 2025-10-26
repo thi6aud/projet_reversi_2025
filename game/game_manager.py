@@ -22,8 +22,6 @@ class GameManager:
       else:
         self.board.apply_move(move[0], move[1], self.current_player.color)
       self.current_player = self.player1 if self.current_player == self.player2 else self.player2
-      if not self.board.get_valid_moves(self.player1.color) and not self.board.get_valid_moves(self.player2.color):
-        break
     
     self.board.display()
     black_count, white_count = self.board.count_discs()
