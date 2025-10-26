@@ -9,7 +9,6 @@ class GameManager:
     self.current_player = self.player1
 
   def run(self):
-    self.board.display()
     print("Game started")
 
     while True:
