@@ -121,3 +121,17 @@ class Board:
           self.grid[rr][cc] = player
           rr -= dr
           cc -= dc
+
+  def clone(self):
+      clone_board = Board()
+      for row in range(8):
+        for col in range(8):
+          clone_board.grid[row][col] = self.grid[row][col]
+      return clone_board
+
+  def is_terminal(self):
+      return not self.get_valid_moves(BLACK) and not self.get_valid_moves(WHITE)
+
+  def score(self, player):
+    black_count, white_count = self.count_discs()
+    return (black_count - white_count) if player == BLACK else (white_count - black_count)
