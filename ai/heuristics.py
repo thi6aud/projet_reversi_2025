@@ -1,5 +1,6 @@
 from game.board import BLACK, DIRECTIONS, EMPTY
 
+# Piece-Square Table (PST) values
 pst = [
   [20, -3, 11, 8, 8, 11, -3, 20],
   [ -3, -7, -4, 1, 1, -4, -7, -3],
@@ -11,11 +12,13 @@ pst = [
   [20, -3, 11, 8, 8, 11, -3, 20]
     ]
 
+# corner, x, c1, c2
 corner_group_1 = [(0, 0), (1, 1), (0, 1), (1, 0)]
-corner_group_2 = [(0, 7), (1, 6), (0, 6), (1, 7)]
+corner_group_2 = [(0, 7), (1, 6), (0, 6), (1, 7)] 
 corner_group_3 = [(7, 0), (6, 1), (6, 0), (7, 1)]
 corner_group_4 = [(7, 7), (6, 6), (6, 7), (7, 6)]
 
+# score weighting based on game phase
 def game_phase(board):
     count_empty = sum(cell == EMPTY for row in board.grid for cell in row)
     if count_empty > 44:
