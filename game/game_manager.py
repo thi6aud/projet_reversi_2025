@@ -4,6 +4,7 @@ import time
 from game.board import Board, BLUE, PINK
 from game.player import HumanPlayer, AIPlayer
 from rich.console import Console
+from game.game_settings import get_gamemode
 
 console = Console()
 
@@ -26,11 +27,7 @@ class GameManager:
   def run(self):
     console.print("\n[bold]Welcome to Reversi![/bold]")
     console.print("__________________________________\n")
-    mode = console.input("Select mode:\n1. Human vs Human\n2. Human vs AI\n3. AI vs AI\nEnter choice (1-3): ")
-    try:
-        mode = int(mode)
-    except ValueError:
-        mode = 1
+    mode = get_gamemode()
     if mode == 1:
         self.player1 = HumanPlayer(BLUE)
         self.player2 = HumanPlayer(PINK)
