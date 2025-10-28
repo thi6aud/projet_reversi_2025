@@ -1,22 +1,5 @@
 from game.board import BLUE, DIRECTIONS, EMPTY
-
-# Piece-Square Table (PST) values
-pst = [
-  [20, -3, 11, 8, 8, 11, -3, 20],
-  [ -3, -7, -4, 1, 1, -4, -7, -3],
-  [11, -4, 2, 2, 2, 2, -4, 11],
-  [8, 1, 2, 0, 0, 2, 1, 8],
-  [8, 1, 2, 0, 0, 2, 1, 8],
-  [11, -4, 2, 2, 2, 2, -4, 11],
-  [-3, -7, -4, 1, 1, -4, -7, -3],
-  [20, -3, 11, 8, 8, 11, -3, 20]
-    ]
-
-# corner, x, c1, c2
-corner_group_1 = [(0, 0), (1, 1), (0, 1), (1, 0)]
-corner_group_2 = [(0, 7), (1, 6), (0, 6), (1, 7)] 
-corner_group_3 = [(7, 0), (6, 1), (6, 0), (7, 1)]
-corner_group_4 = [(7, 7), (6, 6), (6, 7), (7, 6)]
+from ai.heuristics_consts import *
 
 # score weighting based on game phase
 def game_phase(board):
@@ -85,10 +68,8 @@ def corner_score(board, player):
     return score
 
 def risk_score(board, player):
-  score = 0
-  corner_groups = [corner_group_1, corner_group_2, corner_group_3, corner_group_4]
-  
-  for group in corner_groups:
+  score = 0  
+  for group in CORNER_GROUPS:
       if board.grid[group[0][0]][group[0][1]] == EMPTY:
           if board.grid[group[1][0]][group[1][1]] == player:
               score -= 15

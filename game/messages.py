@@ -44,3 +44,6 @@ ERROR_END = "[/red1]"
 
 COLS = "ABCDEFGH"
 ROWS = {str(i) for i in range(1, 9)}
+
+COL_CYAN = "[bold bright_cyan]"
+COL_MAGENTA = "[bold bright_magenta]"
