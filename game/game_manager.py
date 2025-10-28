@@ -33,7 +33,7 @@ class GameManager:
       if not self.board.get_valid_moves(self.player1.color) and not self.board.get_valid_moves(self.player2.color):
         break
       self.board.display()
-      print("Current player :", "Black" if self.current_player.color == BLACK else "White")
+      print("Current player :", "Blue" if self.current_player.color == BLACK else "Pink")
       if isinstance(self.current_player, AIPlayer):
           stop_event = threading.Event()
           loader_thread = threading.Thread(target=ai_loader, args=(stop_event,))
