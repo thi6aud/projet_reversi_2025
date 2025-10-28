@@ -44,7 +44,7 @@ class Board:
             if cell == BLACK:
                 line.append("[bright_cyan]●[/bright_cyan]")
             elif cell == WHITE:
-                line.append("[bright_magenta]●[/bright_magenta]")
+                line.append("[red1]●[/red1]")
             else:
                 line.append("·")
         table.add_row(*line)
