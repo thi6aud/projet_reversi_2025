@@ -1,3 +1,6 @@
+import itertools 
+import threading
+import time
 from rich.console import Console
 
 console = Console()
@@ -18,3 +21,12 @@ MSG_SKIPTURN = "[bold grey53]No valid moves available, skipping turn.[/bold grey
 MSG_BLUEWINS = "[bold bright_cyan]Blue wins![/bold bright_cyan]"
 MSG_PINKWINS = "[bold bright_magenta]Pink wins![/bold bright_magenta]"
 MSG_TIE = "[bold white]It's a tie![/bold white]"
+
+def ai_loader(stop_event):
+    frames = ["⠋ ", "⠙ ", "⠹ ", "⠸ ", "⠼ ", "⠴ ", "⠦ ", "⠧ ", "⠇ ", "⠏ "]
+    for frame in itertools.cycle(frames):
+        if stop_event.is_set():
+            break
+        print(f"\rAI thinking {frame}", end="", flush=True)
+        time.sleep(0.1)
+    print("\r" + " " * 20 + "\r", end="")

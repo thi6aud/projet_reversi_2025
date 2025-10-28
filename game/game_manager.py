@@ -1,23 +1,8 @@
-import itertools # imports 
-import threading
-import time
 from game.board import Board, BLUE, PINK
-from game.messages import print_welcome
 from game.player import HumanPlayer, AIPlayer
 from rich.console import Console
 from game.game_settings import get_gamemode
 from game.messages import *
-
-console = Console()
-
-def ai_loader(stop_event):
-    frames = ["⠋ ", "⠙ ", "⠹ ", "⠸ ", "⠼ ", "⠴ ", "⠦ ", "⠧ ", "⠇ ", "⠏ "]
-    for frame in itertools.cycle(frames):
-        if stop_event.is_set():
-            break
-        print(f"\rAI thinking {frame}", end="", flush=True)
-        time.sleep(0.1)
-    print("\r" + " " * 20 + "\r", end="")
 
 class GameManager:
   def __init__(self):
@@ -38,8 +23,8 @@ class GameManager:
         try:
             depth_choice = int(depth_choice)
         except ValueError:
-          depth_choice = 4  # valeur par défaut si l’utilisateur tape n’importe quoi
-        depth_choice = max(1, min(depth_choice, 5))  # borne entre 1 et 5
+          depth_choice = 4
+        depth_choice = max(1, min(depth_choice, 5))
         self.player2 = AIPlayer(PINK, depth=depth_choice)
     else:
         depth_choice1 = console.input(MSG_DEPTH_CHOICE_1)
