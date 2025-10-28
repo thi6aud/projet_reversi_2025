@@ -24,8 +24,9 @@ class GameManager:
     self.current_player = None
 
   def run(self):
-    console.print("[bold slate_blue1]Welcome to Reversi![/bold slate_blue1]")
-    mode = console.input("Select mode:\n[slate_blue1]1[/slate_blue1]. Human vs Human\n[slate_blue1]2[/slate_blue1]. Human vs AI\n[slate_blue1]3[/slate_blue1]. AI vs AI\nEnter choice ([slate_blue1]1[/slate_blue1]-[slate_blue1]3[/slate_blue1]): ")
+    console.print("\n[bold]Welcome to Reversi![/bold]")
+    console.print("__________________________________\n")
+    mode = console.input("Select mode:\n1. Human vs Human\n2. Human vs AI\n3. AI vs AI\nEnter choice (1-3): ")
     try:
         mode = int(mode)
     except ValueError:
@@ -35,7 +36,7 @@ class GameManager:
         self.player2 = HumanPlayer(PINK)
     elif mode == 2:
         self.player1 = HumanPlayer(BLUE)
-        depth_choice = input("Select AI depth (1 easy - 5 hard): ")
+        depth_choice = console.input("Select AI depth ([bold bright_green]1 easy[/bold bright_green] - [bold bright_red]5 hard[/bold bright_red]): ")
         try:
             depth_choice = int(depth_choice)
         except ValueError:
@@ -43,8 +44,8 @@ class GameManager:
         depth_choice = max(1, min(depth_choice, 5))  # borne entre 1 et 5
         self.player2 = AIPlayer(PINK, depth=depth_choice)
     else:
-        depth_choice1 = input("Select AI 1 depth (1 easy - 5 hard): ")
-        depth_choice2 = input("Select AI 2 depth (1 easy - 5 hard): ")
+        depth_choice1 = console.input("Select AI 1 depth ([bold bright_green]1 easy[/bold bright_green] - [bold bright_red]5 hard[/bold bright_red]): ")
+        depth_choice2 = console.input("Select AI 2 depth ([bold bright_green]1 easy[/bold bright_green] - [bold bright_red]5 hard[/bold bright_red]): ")
         try:
             depth_choice1 = int(depth_choice1)
         except ValueError:
@@ -74,12 +75,12 @@ class GameManager:
       else:
           move = self.current_player.get_move(self.board)
       if move is None:
-        print("No valid moves available, skipping turn.")
+        console.print("[bold grey53]No valid moves available, skipping turn.[/bold grey53]")
       else:
         self.board.apply_move(move[0], move[1], self.current_player.color)
       self.current_player = self.player1 if self.current_player == self.player2 else self.player2
     self.board.display()
     black_count, white_count = self.board.count_discs()
-    print("Black wins!" if black_count > white_count 
-          else "White wins!" if white_count > black_count 
-          else "It's a tie!")
+    console.print("[bold bright_cyan]Blue wins![/bold bright_cyan]" if black_count > white_count 
+          else "[bold bright_magenta]Pink wins![/bold bright_magenta]" if white_count > black_count 
+          else "[bold slate_blue1]It's a tie![/bold slate_blue1]")

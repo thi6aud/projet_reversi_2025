@@ -1,5 +1,10 @@
 import random
 from ai.minimax import choose_move
+from rich.console import Console
+
+from game.board import BLUE, PINK
+
+console = Console()
 
 class Player:
   def __init__(self, color):
@@ -12,7 +17,8 @@ class HumanPlayer(Player):
       return None
 
     while True:
-      print("Valid moves:", ", ".join([f"{c}{r}" for c, r in valid_moves]))
+      message_color = "[bold bright_cyan]" if self.color == BLUE else "[bold bright_magenta]"
+      console.print(f"{message_color}Valid moves:[/]{message_color}", ", ".join([f"{c}{r}" for c, r in valid_moves]))
       raw = input("Enter your move (colrow): ").strip().replace(",", "").replace(" ", "").upper()
 
       # Gère une saisie comme "D3"
