@@ -1,7 +1,7 @@
 import itertools # imports 
 import threading
 import time
-from game.board import Board, BLACK, WHITE
+from game.board import Board, BLUE, PINK
 from game.player import HumanPlayer, AIPlayer
 
 def ai_loader(stop_event):
@@ -16,7 +16,7 @@ def ai_loader(stop_event):
 class GameManager:
   def __init__(self):
     self.board = Board()
-    self.player1 = HumanPlayer(BLACK)
+    self.player1 = HumanPlayer(BLUE)
     self.player2 = None
     self.current_player = self.player1
 
@@ -27,13 +27,13 @@ class GameManager:
     except ValueError:
       depth_choice = 4  # valeur par défaut si l’utilisateur tape n’importe quoi
     depth_choice = max(1, min(depth_choice, 7))  # borne entre 1 et 7
-    self.player2 = AIPlayer(WHITE, depth_choice)
+    self.player2 = AIPlayer(PINK, depth_choice)
     print("Game started")
     while True:
       if not self.board.get_valid_moves(self.player1.color) and not self.board.get_valid_moves(self.player2.color):
         break
       self.board.display()
-      print("Current player :", "Black" if self.current_player.color == BLACK else "White")
+      print("Current player :", "Blue" if self.current_player.color == BLUE else "Pink")
       if isinstance(self.current_player, AIPlayer):
           stop_event = threading.Event()
           loader_thread = threading.Thread(target=ai_loader, args=(stop_event,))

@@ -1,4 +1,4 @@
-from game.board import BLACK, DIRECTIONS, EMPTY
+from game.board import BLUE, DIRECTIONS, EMPTY
 
 # Piece-Square Table (PST) values
 pst = [
@@ -126,4 +126,4 @@ def pst_score(board, player):
 
 def discs_score(board, player):
     discs = board.count_discs()
-    return discs[0] - discs[1] if player == BLACK else discs[1] - discs[0]
+    return discs[0] - discs[1] if player == BLUE else discs[1] - discs[0]

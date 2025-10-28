@@ -5,8 +5,8 @@ from rich import box
 console = Console()
 
 EMPTY = 0
-BLACK = 1
-WHITE = -1
+BLUE = 1
+PINK = -1
 
 DIRECTIONS = [(-1, -1), (-1, 0), (-1, 1),
               (0, -1),           (0, 1),
@@ -19,16 +19,16 @@ class Board:
     self._init_start_position()
   
   def _init_start_position(self):
-    self.grid[3][3] = WHITE
-    self.grid[3][4] = BLACK
-    self.grid[4][3] = BLACK
-    self.grid[4][4] = WHITE
+    self.grid[3][3] = PINK
+    self.grid[3][4] = BLUE
+    self.grid[4][3] = BLUE
+    self.grid[4][4] = PINK
 
   def count_discs(self):
-    black_count = sum(cell == BLACK for row in self.grid for cell in row)
-    white_count = sum(cell == WHITE for row in self.grid for cell in row)
-    return black_count, white_count
-  
+    blue_count = sum(cell == BLUE for row in self.grid for cell in row)
+    pink_count = sum(cell == PINK for row in self.grid for cell in row)
+    return blue_count, pink_count
+
   def display(self):
     table = Table(show_header=True, show_lines=True, box=box.SQUARE)
     
@@ -41,17 +41,17 @@ class Board:
     for i, row in enumerate(self.grid):
         line = [str(i + 1)]
         for cell in row:
-            if cell == BLACK:
+            if cell == BLUE:
                 line.append("[bright_cyan]●[/bright_cyan]")
-            elif cell == WHITE:
+            elif cell == PINK:
                 line.append("[bright_magenta]●[/bright_magenta]")
             else:
                 line.append("·")
         table.add_row(*line)
 
-    black_count, white_count = self.count_discs()
+    blue_count, pink_count = self.count_discs()
     console.print(table)
-    console.print(f"[bold white]Blue:[/bold white] [bright_cyan]{black_count}[/bright_cyan] - [bold white]Pink:[/bold white] [bright_magenta]{white_count}[/bright_magenta]")
+    console.print(f"[bold white]Blue:[/bold white] [bright_cyan]{blue_count}[/bright_cyan] - [bold white]Pink:[/bold white] [bright_magenta]{pink_count}[/bright_magenta]")
 
   def get_valid_moves(self, player):
     valid_moves = []
@@ -130,8 +130,8 @@ class Board:
       return clone_board
 
   def is_terminal(self):
-      return not self.get_valid_moves(BLACK) and not self.get_valid_moves(WHITE)
+      return not self.get_valid_moves(BLUE) and not self.get_valid_moves(PINK)
 
   def score(self, player):
-    black_count, white_count = self.count_discs()
-    return (black_count - white_count) if player == BLACK else (white_count - black_count)
+    blue_count, pink_count = self.count_discs()
+    return (blue_count - pink_count) if player == BLUE else (pink_count - blue_count)
