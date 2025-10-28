@@ -1,7 +1,7 @@
 import random
 from ai.minimax import choose_move
 from rich.console import Console
-
+from game.messages import *
 from game.board import BLUE, PINK
 
 console = Console()
@@ -18,31 +18,31 @@ class HumanPlayer(Player):
 
     while True:
       message_color = "[bold bright_cyan]" if self.color == BLUE else "[bold bright_magenta]"
-      console.print(f"{message_color}Valid moves:[/]{message_color}", ", ".join([f"{c}{r}" for c, r in valid_moves]))
-      raw = input("Enter your move (colrow): ").strip().replace(",", "").replace(" ", "").upper()
+      console.print(f"{message_color}{MSG_VALIDMOVES}[/]{message_color}", ", ".join([f"{c}{r}" for c, r in valid_moves]))
+      raw = input(MSG_ENTERMOVE).strip().replace(",", "").replace(" ", "").upper()
 
       # Gère une saisie comme "D3"
       if len(raw) == 2 and raw[0].isalpha() and raw[1].isdigit():
           col_part, row_part = raw[0], raw[1]
       else:
-          print("Expected format: e.g. D3")
+          console.print(f"{ERROR_START}{ERR_EXPECTEDFORMAT}{ERROR_END}")
           continue
 
       # Ligne 1–8
-      if not row_part.isdigit() or not (1 <= int(row_part) <= 8):
-          print("Row must be between 1 and 8.")
+      if row_part not in ROWS:
+          console.print(f"{ERROR_START}{ERR_ROWRANGE}{ERROR_END}")
           continue
       row = int(row_part)
 
       # Colonne A–H
-      if col_part not in "ABCDEFGH":
-          print("Column must be between A–H.")
+      if col_part not in COLS:
+          console.print(f"{ERROR_START}{ERR_COLRANGE}{ERROR_END}")
           continue
       col = col_part
 
       move = (col, row)
       if move not in valid_moves:
-          print("Invalid move. Try again.")
+          console.print(f"{ERROR_START}{ERR_INVALIDMOVE}{ERROR_END}")
           continue
 
       return move
