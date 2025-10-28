@@ -1,4 +1,4 @@
-import itertools
+import itertools # import
 import threading
 import time
 from game.board import Board, BLACK, WHITE
