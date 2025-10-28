@@ -14,3 +14,5 @@ CORNER_GROUP_2 = [(0, 7), (1, 6), (0, 6), (1, 7)]
 CORNER_GROUP_3 = [(7, 0), (6, 1), (6, 0), (7, 1)]
 CORNER_GROUP_4 = [(7, 7), (6, 6), (6, 7), (7, 6)]
 CORNER_GROUPS = [CORNER_GROUP_1, CORNER_GROUP_2, CORNER_GROUP_3, CORNER_GROUP_4]
+
+CORNERS = [(0, 0), (0, 7), (7, 0), (7, 7)]

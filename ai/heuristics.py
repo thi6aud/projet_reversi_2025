@@ -58,9 +58,8 @@ def mobility_score(board, player):
     return player_moves - opponent_moves
 
 def corner_score(board, player):
-    corner_pos = [(0, 0), (0, 7), (7, 0), (7, 7)]
     score = 0
-    for (r, c) in corner_pos:
+    for (r, c) in CORNERS:
       if board.grid[r][c] == player:
           score += 25
       elif board.grid[r][c] == -player:
@@ -100,9 +99,9 @@ def pst_score(board, player):
     for r in range(8):
         for c in range(8):
             if board.grid[r][c] == player:
-                score += pst[r][c]
+                score += PST[r][c]
             elif board.grid[r][c] == -player:
-                score -= pst[r][c]
+                score -= PST[r][c]
     return score
 
 def discs_score(board, player):
