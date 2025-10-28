@@ -50,6 +50,6 @@ class GameManager:
       self.current_player = self.player1 if self.current_player == self.player2 else self.player2
     self.board.display()
     black_count, white_count = self.board.count_discs()
-    print("Black wins!" if black_count > white_count 
-          else "White wins!" if white_count > black_count 
+    print("Blue wins!" if black_count > white_count 
+          else "Pink wins!" if white_count > black_count 
           else "It's a tie!")
