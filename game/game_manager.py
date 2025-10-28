@@ -2,9 +2,11 @@ import itertools # imports
 import threading
 import time
 from game.board import Board, BLUE, PINK
+from game.messages import print_welcome
 from game.player import HumanPlayer, AIPlayer
 from rich.console import Console
 from game.game_settings import get_gamemode
+from game.messages import *
 
 console = Console()
 
@@ -25,15 +27,14 @@ class GameManager:
     self.current_player = None
 
   def run(self):
-    console.print("\n[bold]Welcome to Reversi![/bold]")
-    console.print("__________________________________\n")
+    console.print(MSG_WELCOME)
     mode = get_gamemode()
     if mode == 1:
         self.player1 = HumanPlayer(BLUE)
         self.player2 = HumanPlayer(PINK)
     elif mode == 2:
         self.player1 = HumanPlayer(BLUE)
-        depth_choice = console.input("Select AI depth ([bold bright_green]1 easy[/bold bright_green] - [bold bright_red]5 hard[/bold bright_red]): ")
+        depth_choice = console.input(MSG_DEPTH_CHOICE)
         try:
             depth_choice = int(depth_choice)
         except ValueError:
@@ -41,8 +42,8 @@ class GameManager:
         depth_choice = max(1, min(depth_choice, 5))  # borne entre 1 et 5
         self.player2 = AIPlayer(PINK, depth=depth_choice)
     else:
-        depth_choice1 = console.input("Select AI 1 depth ([bold bright_green]1 easy[/bold bright_green] - [bold bright_red]5 hard[/bold bright_red]): ")
-        depth_choice2 = console.input("Select AI 2 depth ([bold bright_green]1 easy[/bold bright_green] - [bold bright_red]5 hard[/bold bright_red]): ")
+        depth_choice1 = console.input(MSG_DEPTH_CHOICE_1)
+        depth_choice2 = console.input(MSG_DEPTH_CHOICE_2)
         try:
             depth_choice1 = int(depth_choice1)
         except ValueError:
@@ -56,12 +57,12 @@ class GameManager:
         self.player1 = AIPlayer(BLUE, depth=depth_choice1)
         self.player2 = AIPlayer(PINK, depth=depth_choice2)
     self.current_player = self.player1
-    console.print("\n[bold]Game started![/bold]")
+    console.print(MSG_GAMESTARTED)
     while True:
       if not self.board.get_valid_moves(self.player1.color) and not self.board.get_valid_moves(self.player2.color):
         break
       self.board.display()
-      console.print("Current player :", "[bold bright_cyan]Blue[/bold bright_cyan]" if self.current_player.color == BLUE else "[bold bright_magenta]Pink[/bold bright_magenta]")
+      console.print(MSG_BLUETURN if self.current_player.color == BLUE else MSG_PINKTURN)
       if isinstance(self.current_player, AIPlayer):
           stop_event = threading.Event()
           loader_thread = threading.Thread(target=ai_loader, args=(stop_event,))
@@ -72,12 +73,12 @@ class GameManager:
       else:
           move = self.current_player.get_move(self.board)
       if move is None:
-        console.print("[bold grey53]No valid moves available, skipping turn.[/bold grey53]")
+        console.print(MSG_SKIPTURN)
       else:
         self.board.apply_move(move[0], move[1], self.current_player.color)
       self.current_player = self.player1 if self.current_player == self.player2 else self.player2
     self.board.display()
     black_count, white_count = self.board.count_discs()
-    console.print("[bold bright_cyan]Blue wins![/bold bright_cyan]" if black_count > white_count 
-          else "[bold bright_magenta]Pink wins![/bold bright_magenta]" if white_count > black_count 
-          else "[bold slate_blue1]It's a tie![/bold slate_blue1]")
+    console.print(MSG_BLUEWINS if black_count > white_count 
+          else MSG_PINKWINS if white_count > black_count 
+          else MSG_TIE)
