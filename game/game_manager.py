@@ -1,4 +1,4 @@
-import itertools # import
+import itertools # imports 
 import threading
 import time
 from game.board import Board, BLACK, WHITE
@@ -33,7 +33,7 @@ class GameManager:
       if not self.board.get_valid_moves(self.player1.color) and not self.board.get_valid_moves(self.player2.color):
         break
       self.board.display()
-      print("Current player :", "Blue" if self.current_player.color == BLACK else "Pink")
+      print("Current player :", "Black" if self.current_player.color == BLACK else "White")
       if isinstance(self.current_player, AIPlayer):
           stop_event = threading.Event()
           loader_thread = threading.Thread(target=ai_loader, args=(stop_event,))
@@ -50,6 +50,6 @@ class GameManager:
       self.current_player = self.player1 if self.current_player == self.player2 else self.player2
     self.board.display()
     black_count, white_count = self.board.count_discs()
-    print("Blue wins!" if black_count > white_count 
-          else "Pink wins!" if white_count > black_count 
+    print("Black wins!" if black_count > white_count 
+          else "White wins!" if white_count > black_count 
           else "It's a tie!")
