@@ -42,11 +42,12 @@ class HumanPlayer(Player):
       return move
 
 class AIPlayer(Player):
-  def __init__(self, color):
+  def __init__(self, color, depth=4):
     super().__init__(color)
+    self.depth = depth
 
   def get_move(self, board):
     valid_moves = board.get_valid_moves(self.color)
     if not valid_moves:
       return None
-    return choose_move(board, self.color, depth=10)
+    return choose_move(board, self.color, depth=self.depth)

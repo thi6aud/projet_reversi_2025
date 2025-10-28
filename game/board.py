@@ -42,16 +42,16 @@ class Board:
         line = [str(i + 1)]
         for cell in row:
             if cell == BLACK:
-                line.append("[black]●[/black]")
+                line.append("[bright_cyan]●[/bright_cyan]")
             elif cell == WHITE:
-                line.append("[white]●[/white]")
+                line.append("[bright_magenta]●[/bright_magenta]")
             else:
                 line.append("·")
         table.add_row(*line)
 
     black_count, white_count = self.count_discs()
     console.print(table)
-    console.print(f"[bold white]Black:[/bold white] {black_count} - [bold white]White:[/bold white] {white_count}")
+    console.print(f"[bold white]Blue:[/bold white] {black_count} - [bold white]Pink:[/bold white] {white_count}")
 
   def get_valid_moves(self, player):
     valid_moves = []
