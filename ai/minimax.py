@@ -3,16 +3,12 @@ from ai.heuristics import evaluate
 def choose_move(board, player, depth):
     valid_moves = board.get_valid_moves(player)
     if not valid_moves:
-        return None  
-    best_score = float('-inf')
-    best_move = None
-    for move in valid_moves:
-        clone_board = board.clone()
-        clone_board.apply_move(move[0], move[1], player)
-        score = -search(clone_board, -player, depth - 1)
-        if score > best_score:
-            best_score = score
-            best_move = move   
+        return None
+    def evaluate_move(move):
+        clone = board.clone()
+        clone.apply_move(move[0], move[1], player)
+        return -search(clone, -player, depth - 1)
+    best_move = max(valid_moves, key=evaluate_move)
     return best_move
   
 def search(board, player, depth, alpha=float('-inf'), beta=float('inf')):
