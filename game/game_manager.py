@@ -3,6 +3,9 @@ import threading
 import time
 from game.board import Board, BLUE, PINK
 from game.player import HumanPlayer, AIPlayer
+from rich.console import Console
+
+console = Console()
 
 def ai_loader(stop_event):
     frames = ["⠋ ", "⠙ ", "⠹ ", "⠸ ", "⠼ ", "⠴ ", "⠦ ", "⠧ ", "⠇ ", "⠏ "]
@@ -16,24 +19,51 @@ def ai_loader(stop_event):
 class GameManager:
   def __init__(self):
     self.board = Board()
-    self.player1 = HumanPlayer(BLUE)
+    self.player1 = None
     self.player2 = None
-    self.current_player = self.player1
+    self.current_player = None
 
   def run(self):
-    depth_choice = input("Select AI depth (1 easy - 4 hard): ")
+    console.print("[bold slate_blue1]Welcome to Reversi![/bold slate_blue1]")
+    mode = console.input("Select mode:\n[slate_blue1]1[/slate_blue1]. Human vs Human\n[slate_blue1]2[/slate_blue1]. Human vs AI\n[slate_blue1]3[/slate_blue1]. AI vs AI\nEnter choice ([slate_blue1]1[/slate_blue1]-[slate_blue1]3[/slate_blue1]): ")
     try:
-        depth_choice = int(depth_choice)
+        mode = int(mode)
     except ValueError:
-      depth_choice = 4  # valeur par défaut si l’utilisateur tape n’importe quoi
-    depth_choice = max(1, min(depth_choice, 7))  # borne entre 1 et 7
-    self.player2 = AIPlayer(PINK, depth_choice)
-    print("Game started")
+        mode = 1
+    if mode == 1:
+        self.player1 = HumanPlayer(BLUE)
+        self.player2 = HumanPlayer(PINK)
+    elif mode == 2:
+        self.player1 = HumanPlayer(BLUE)
+        depth_choice = input("Select AI depth (1 easy - 5 hard): ")
+        try:
+            depth_choice = int(depth_choice)
+        except ValueError:
+          depth_choice = 4  # valeur par défaut si l’utilisateur tape n’importe quoi
+        depth_choice = max(1, min(depth_choice, 5))  # borne entre 1 et 5
+        self.player2 = AIPlayer(PINK, depth=depth_choice)
+    else:
+        depth_choice1 = input("Select AI 1 depth (1 easy - 5 hard): ")
+        depth_choice2 = input("Select AI 2 depth (1 easy - 5 hard): ")
+        try:
+            depth_choice1 = int(depth_choice1)
+        except ValueError:
+            depth_choice1 = 4
+        try:
+            depth_choice2 = int(depth_choice2)
+        except ValueError:
+            depth_choice2 = 4
+        depth_choice1 = max(1, min(depth_choice1, 5))
+        depth_choice2 = max(1, min(depth_choice2, 5))
+        self.player1 = AIPlayer(BLUE, depth=depth_choice1)
+        self.player2 = AIPlayer(PINK, depth=depth_choice2)
+    self.current_player = self.player1
+    console.print("\n[bold]Game started![/bold]")
     while True:
       if not self.board.get_valid_moves(self.player1.color) and not self.board.get_valid_moves(self.player2.color):
         break
       self.board.display()
-      print("Current player :", "Blue" if self.current_player.color == BLUE else "Pink")
+      console.print("Current player :", "[bold bright_cyan]Blue[/bold bright_cyan]" if self.current_player.color == BLUE else "[bold bright_magenta]Pink[/bold bright_magenta]")
       if isinstance(self.current_player, AIPlayer):
           stop_event = threading.Event()
           loader_thread = threading.Thread(target=ai_loader, args=(stop_event,))
