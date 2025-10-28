@@ -1,5 +1,17 @@
+import itertools
+import threading
+import time
 from game.board import Board, BLACK, WHITE
 from game.player import HumanPlayer, AIPlayer
+
+def show_loader(stop_event):
+    frames = ["⠋ ", "⠙ ", "⠹ ", "⠸ ", "⠼ ", "⠴ ", "⠦ ", "⠧ ", "⠇ ", "⠏ "]
+    for frame in itertools.cycle(frames):
+        if stop_event.is_set():
+            break
+        print(f"\rAI thinking {frame}", end="", flush=True)
+        time.sleep(0.1)
+    print("\r" + " " * 20 + "\r", end="")
 
 class GameManager:
   def __init__(self):
@@ -16,7 +28,15 @@ class GameManager:
         break
       self.board.display()
       print("Current player :", "Black" if self.current_player.color == BLACK else "White")
-      move = self.current_player.get_move(self.board)
+      if isinstance(self.current_player, AIPlayer):
+          stop_event = threading.Event()
+          loader_thread = threading.Thread(target=show_loader, args=(stop_event,))
+          loader_thread.start()
+          move = self.current_player.get_move(self.board)
+          stop_event.set()
+          loader_thread.join()
+      else:
+          move = self.current_player.get_move(self.board)
       if move is None:
         print("No valid moves available, skipping turn.")
       else:

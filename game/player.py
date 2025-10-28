@@ -49,4 +49,4 @@ class AIPlayer(Player):
     valid_moves = board.get_valid_moves(self.color)
     if not valid_moves:
       return None
-    return choose_move(board, self.color, depth=7)
+    return choose_move(board, self.color, depth=10)
