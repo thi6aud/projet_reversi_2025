@@ -14,7 +14,7 @@ def ai_loader(stop_event):
         time.sleep(0.1)
     print("\r" + " " * 20 + "\r", end="")
 
-MSG_WELCOME = "\n[bold]Welcome to Reversi![/bold]\n__________________________________\n"
+MSG_WELCOME = "\n[bold cyan]Welcome to Reversi![/bold cyan]\n__________________________________\n"
 
 MSG_DEPTH_CHOICE = "Select AI depth ([bold bright_green]1 easy[/bold bright_green] - [bold bright_red]5 hard[/bold bright_red]): "
 MSG_DEPTH_CHOICE_1 = "Select AI 1 depth ([bold bright_green]1 easy[/bold bright_green] - [bold bright_red]5 hard[/bold bright_red]): "
