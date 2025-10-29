@@ -3,7 +3,7 @@ from rich.console import Console
 console = Console()
 
 def get_gamemode():
-  mode = console.input("Select mode:\n1. Human vs Human\n2. Human vs AI\n3. AI vs AI\nEnter choice (1-3): ")
+  mode = console.input("\nSelect mode:\n1. Human vs Human\n2. Human vs AI\n3. AI vs AI\n\nEnter choice (1-3): ")
   try:
       mode = int(mode)
   except ValueError:
