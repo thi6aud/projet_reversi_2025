@@ -12,7 +12,9 @@ class GameManager:
     self.current_player = None
 
   def run(self):
-    print_slowly(MSG_WELCOME4)
+    print_slowly(MSG_WELCOME)
+    console.print()
+    print_slowly(MSG_AUTHORS)
     mode = get_gamemode()
     if mode == 1:
         self.player1 = HumanPlayer(BLUE)
