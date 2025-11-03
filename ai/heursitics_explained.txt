@@ -1,0 +1,22 @@
+Heuristics are here to let the AI know what is best to play based on a score:
+
+Game phases:
+  Depending on the game advencement (phase) actions don't have the same weight
+  - Phase 1 "opening": 64-44 empty cells -> emphasizes mobility and risk
+  - Phase 2 "midgmae": 44-20 empty cells -> emphasizes mobility and board control
+  - Phase 3 "endgame": 20-0 empty cells -> emphasizes discs count
+
+Score:
+  To get the score of a move we calculate sum[subscores(i) * weights(i)]
+
+Subscores:
+  - mobility -> do you get more mobility than your opponent?
+  - corner -> do you access/give-away a corner?
+  - risk -> do you give-away a corner? (Really usefull w/ pst?)
+  - frontier -> do you have frontier discs?
+  - pst -> which cell value are you getting?
+  - discs -> do you get more discs than your opponent?
+
+Weights:
+  W=[-1.5, 1.5] is a value used to emphasize certain subscores depending
+  on the current game phase. (Might need some rework)
