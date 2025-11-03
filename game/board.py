@@ -72,7 +72,6 @@ class Board:
             c += dc
 
           if self.inside(r, c) and self.grid[r][c] == player and found_opponent:
-            # exposer au format humain (col, row) -> ex: ("D", 3)
             valid_moves.append((chr(col + ord("A")), row + 1))
             break
 
@@ -82,10 +81,6 @@ class Board:
     return 0 <= row < 8 and 0 <= col < 8
 
   def apply_move(self, col, row, player):
-    """
-    Reçoit un coup au format humain (col lettre A–H, row 1–8), ex: ('D', 3).
-    À l'intérieur on travaille en (row, col) 0-indexés.
-    """
     col = col.upper()
     human_move = (col, row)
 

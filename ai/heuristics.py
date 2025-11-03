@@ -71,9 +71,9 @@ def risk_score(board, player):
   for group in CORNER_GROUPS:
       if board.grid[group[0][0]][group[0][1]] == EMPTY:
           if board.grid[group[1][0]][group[1][1]] == player:
-              score -= 15
-          elif board.grid[group[1][0]][group[1][1]] == -player:
               score += 15
+          elif board.grid[group[1][0]][group[1][1]] == -player:
+              score -= 15
   return score
 
 def frontier_score(board, player):
