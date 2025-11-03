@@ -30,7 +30,7 @@ MSG_WELCOME = '''
 d88'      `?888P'`  ?888P'   `?888P' d88'      `?888P'  d88'  
 '''
 
-MSG_AUTHORS = "Arsil Ibahim, Madhjoub Amélia, Delucinge Thibaud"
+MSG_AUTHORS = "Arsil Ibrahim Saleh, Mahdjoub Amélia, Delucinge Thibaud"
 
 MSG_DEPTH_CHOICE = "Select AI depth ([bold bright_green]1 easy[/bold bright_green] - [bold bright_red]5 hard[/bold bright_red]): "
 MSG_DEPTH_CHOICE_1 = "Select AI 1 depth ([bold bright_green]1 easy[/bold bright_green] - [bold bright_red]5 hard[/bold bright_red]): "
