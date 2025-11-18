@@ -1,8 +1,8 @@
 from game.board import Board, BLUE, PINK
 from game.player import HumanPlayer, AIPlayer
-from rich.console import Console
-from game.game_settings import get_gamemode
-from game.messages import *
+from ui.game_settings import get_gamemode
+from ui.game_sign import game_setup
+from ui.messages import *
 
 class GameManager:
   def __init__(self):
@@ -12,9 +12,7 @@ class GameManager:
     self.current_player = None
 
   def run(self):
-    print_slowly(MSG_WELCOME)
-    console.print()
-    print_slowly(MSG_AUTHORS)
+    game_setup()
     mode = get_gamemode()
     if mode == 1:
         self.player1 = HumanPlayer(BLUE)

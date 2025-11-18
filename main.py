@@ -1,4 +1,3 @@
-
 from game.game_manager import GameManager
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 from ai.minimax import choose_move
 from rich.console import Console
-from game.messages import *
+from ui.messages import *
 from game.board import BLUE
 
 console = Console()
