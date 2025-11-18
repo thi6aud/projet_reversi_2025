@@ -28,6 +28,8 @@ MSG_WELCOME = '''
   88P'  ` d8b_,dPd  88  d8P' d8b_,dP   88P'  `  ?8b,      88P
  d88      88b       8b ,88'  88b      d88         `?8b   d88 
 d88'      `?888P'`  ?888P'   `?888P' d88'      `?888P'  d88'  
+
+Arsil Ibrahim Saleh, Mahdjoub Amélia, Delucinge Thibaud
 '''
 
 MSG_AUTHORS = "Arsil Ibrahim Saleh, Mahdjoub Amélia, Delucinge Thibaud"
