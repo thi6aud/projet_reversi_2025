@@ -1,4 +1,5 @@
 from ai.heuristics import evaluate
+from ai.heuristics_consts import *
 
 def choose_move(board, player, depth):
     valid_moves = board.get_valid_moves(player)
@@ -21,7 +22,7 @@ def search(board, player, depth, alpha=float('-inf'), beta=float('inf')):
   if not valid_moves:
     return -search(board, -player, depth, -beta, -alpha)
   def score(move):
-    return quick_eval(board, move, player)
+    return quick_eval(move)
   valid_moves.sort(key=score, reverse=True)
   for move in valid_moves:
     clone_board = board.clone()
@@ -33,7 +34,34 @@ def search(board, player, depth, alpha=float('-inf'), beta=float('inf')):
       break
   return best_score
 
-def quick_eval(board, move, player):
-    clone = board.clone()
-    clone.apply_move(move[0], move[1], player)
-    return evaluate(clone, player)
+def quick_eval(move):
+    row, col = move
+
+    # Normaliser la colonne (lettre ou chiffre en string)
+    if isinstance(col, str):
+        col_str = col.strip().upper()
+        if len(col_str) == 1 and col_str.isalpha():
+            col = ord(col_str) - ord('A')   # 'A'->0, 'B'->1, ...
+        elif col_str.isdigit():
+            col = int(col_str)
+    if not isinstance(col, int):
+        col = 0  # valeur de secours
+
+    # Normaliser la ligne (string -> int)
+    if isinstance(row, str):
+        row_str = row.strip()
+        if row_str.isdigit():
+            row = int(row_str)
+
+    if isinstance(row, int) and 1 <= row <= 8:
+        row_idx = row - 1
+    elif isinstance(row, int):
+        row_idx = row
+    else:
+        row_idx = 0  # valeur de secours
+
+    # Bornage 0–7
+    row_idx = max(0, min(7, row_idx))
+    col = max(0, min(7, col))
+
+    return PST[row_idx][col]

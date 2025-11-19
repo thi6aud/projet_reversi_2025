@@ -60,21 +60,21 @@ def mobility_score(board, player):
 def corner_score(board, player):
     score = 0
     for (r, c) in CORNERS:
-      if board.grid[r][c] == player:
-          score += 25
-      elif board.grid[r][c] == -player:
-          score -= 25
+        if board.grid[r][c] == player:
+            score += 25
+        elif board.grid[r][c] == -player:
+            score -= 25
     return score
 
 def risk_score(board, player):
-  score = 0  
-  for group in CORNER_GROUPS:
-      if board.grid[group[0][0]][group[0][1]] == EMPTY:
-          if board.grid[group[1][0]][group[1][1]] == player:
-              score += 15
-          elif board.grid[group[1][0]][group[1][1]] == -player:
-              score -= 15
-  return score
+    score = 0  
+    for group in CORNER_GROUPS:
+        if board.grid[group[0][0]][group[0][1]] == EMPTY:
+            if board.grid[group[1][0]][group[1][1]] == player:
+                score += 15
+            elif board.grid[group[1][0]][group[1][1]] == -player:
+                score -= 15
+    return score
 
 def frontier_score(board, player):
     score = 0
