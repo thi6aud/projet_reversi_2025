@@ -13,7 +13,12 @@ def choose_move(board, player, depth):
     best_move = max(valid_moves, key=evaluate_move)
     return best_move
 
+TT = {}
+
 def search(board, player, depth, alpha=float('-inf'), beta=float('inf')):
+  key = (tuple(map(tuple, board.grid)), player, depth)
+  if key in TT:
+    return TT[key]
   best_score = float('-inf')
   if board.is_terminal():
     return board.score(player)
@@ -34,6 +39,7 @@ def search(board, player, depth, alpha=float('-inf'), beta=float('inf')):
     alpha = max(alpha, child_score)
     if alpha >= beta:
         break
+  TT[key] = best_score
   return best_score
 
 def quick_eval(move):
