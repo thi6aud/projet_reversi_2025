@@ -124,6 +124,64 @@ class Board:
           clone_board.grid[row][col] = self.grid[row][col]
       return clone_board
 
+  def make_move(self, move, player):
+      """
+      Applique un coup (col, row) sans cloner.
+      Retourne la liste des positions retournées pour undo.
+      move = (colLetter, rowNumber)
+      """
+      col, row = move
+      col = col.upper()
+
+      flipped = []
+
+      # Convert to 0-based indices
+      r = row - 1
+      c = ord(col) - ord("A")
+
+      # Place the stone
+      self.grid[r][c] = player
+
+      # Explore all directions
+      for dr, dc in DIRECTIONS:
+          rr = r + dr
+          cc = c + dc
+
+          temp = []
+
+          # Follow opponent pieces
+          while self.inside(rr, cc) and self.grid[rr][cc] == -player:
+              temp.append((rr, cc))
+              rr += dr
+              cc += dc
+
+          # If we end on player's own piece, flip the chain
+          if self.inside(rr, cc) and self.grid[rr][cc] == player and len(temp) > 0:
+              for pos in temp:
+                  self.grid[pos[0]][pos[1]] = player
+              flipped.extend(temp)
+
+      return flipped
+
+  def undo_move(self, move, flipped, player):
+      """
+      Annule un coup joué par make_move.
+      move = (colLetter, rowNumber)
+      flipped = liste des positions retournées
+      """
+      col, row = move
+      col = col.upper()
+
+      r = row - 1
+      c = ord(col) - ord("A")
+
+      # Remove the placed stone
+      self.grid[r][c] = EMPTY
+
+      # Undo flips: restore opponent's color
+      for (rr, cc) in flipped:
+          self.grid[rr][cc] = -player
+
   def is_terminal(self):
       return not self.get_valid_moves(BLUE) and not self.get_valid_moves(PINK)
 
