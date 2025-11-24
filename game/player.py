@@ -2,6 +2,8 @@ from ai.minimax import choose_move
 from rich.console import Console
 from ui.messages import *
 from game.board import BLUE
+import random
+
 
 console = Console()
 
@@ -49,3 +51,12 @@ class AIPlayer(Player):
         if not valid_moves:
             return None
         return choose_move(board, self.color, depth=self.depth)
+    
+
+class RandomAIPlayer(Player):
+    # IA qui choisit un coup au hasard parmi les coups valides
+    def get_move(self, board):
+        valid_moves = board.get_valid_moves(self.color)
+        if not valid_moves:
+            return None
+        return random.choice(valid_moves)

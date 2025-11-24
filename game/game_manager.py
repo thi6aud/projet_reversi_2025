@@ -1,7 +1,7 @@
 import time
 import threading
 from game.board import Board, BLUE, PINK
-from game.player import HumanPlayer, AIPlayer
+from game.player import HumanPlayer, AIPlayer, RandomAIPlayer
 from ui.game_settings import get_gamemode
 from ui.game_sign import game_setup
 from ui.messages import *
@@ -34,6 +34,20 @@ class GameManager:
             except ValueError:
                 depth_choice = 4
             depth_choice = max(1, min(depth_choice, 5))
+            self.player2 = AIPlayer(PINK, depth=depth_choice)
+        elif mode == 3:
+            # IA random vs humain
+            self.player1 = RandomAIPlayer(BLUE)
+            self.player2 = HumanPlayer(PINK)
+        elif mode == 4:
+            # IA random vs IA avec profondeur
+            depth_choice = console.input(MSG_DEPTH_CHOICE)
+            try:
+                depth_choice = int(depth_choice)
+            except ValueError:
+                depth_choice = 4
+            depth_choice = max(1, min(depth_choice, 5))
+            self.player1 = RandomAIPlayer(BLUE)
             self.player2 = AIPlayer(PINK, depth=depth_choice)
         else:
             depth_choice1 = console.input(MSG_DEPTH_CHOICE_1)
