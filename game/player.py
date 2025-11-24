@@ -6,44 +6,46 @@ from game.board import BLUE
 console = Console()
 
 class Player:
-  def __init__(self, color):
-    self.color = color
+    def __init__(self, color):
+        self.color = color
 
-class HumanPlayer(Player): # Gestion des coups valides du joueur humain
-  def get_move(self, board):
-    valid_moves = board.get_valid_moves(self.color)
-    if not valid_moves:
-      return None
-    while True:
-      message_color = COL_CYAN if self.color == BLUE else COL_MAGENTA
-      console.print(f"{message_color}{MSG_VALIDMOVES}[/]{message_color}", ", ".join([f"{c}{r}" for c, r in valid_moves]))
-      raw = input(MSG_ENTERMOVE).strip().replace(",", "").replace(" ", "").upper()
-      if len(raw) == 2 and raw[0].isalpha() and raw[1].isdigit():
-          col_part, row_part = raw[0], raw[1]
-      else:
-          console.print(f"{ERROR_START}{ERR_EXPECTEDFORMAT}{ERROR_END}")
-          continue
-      if row_part not in ROWS:
-          console.print(f"{ERROR_START}{ERR_ROWRANGE}{ERROR_END}")
-          continue
-      row = int(row_part)
-      if col_part not in COLS:
-          console.print(f"{ERROR_START}{ERR_COLRANGE}{ERROR_END}")
-          continue
-      col = col_part
-      move = (col, row)
-      if move not in valid_moves:
-          console.print(f"{ERROR_START}{ERR_INVALIDMOVE}{ERROR_END}")
-          continue
-      return move
+class HumanPlayer(Player):
+    # Gestion des coups valides du joueur humain
+    def get_move(self, board):
+        valid_moves = board.get_valid_moves(self.color)
+        if not valid_moves:
+            return None
+        while True:
+            message_color = COL_CYAN if self.color == BLUE else COL_MAGENTA
+            console.print(f"{message_color}{MSG_VALIDMOVES}[/]{message_color}", ", ".join([f"{c}{r}" for c, r in valid_moves]))
+            raw = input(MSG_ENTERMOVE).strip().replace(",", "").replace(" ", "").upper()
+            if len(raw) == 2 and raw[0].isalpha() and raw[1].isdigit():
+                col_part, row_part = raw[0], raw[1]
+            else:
+                console.print(f"{ERROR_START}{ERR_EXPECTEDFORMAT}{ERROR_END}")
+                continue
+            if row_part not in ROWS:
+                console.print(f"{ERROR_START}{ERR_ROWRANGE}{ERROR_END}")
+                continue
+            row = int(row_part)
+            if col_part not in COLS:
+                console.print(f"{ERROR_START}{ERR_COLRANGE}{ERROR_END}")
+                continue
+            col = col_part
+            move = (col, row)
+            if move not in valid_moves:
+                console.print(f"{ERROR_START}{ERR_INVALIDMOVE}{ERROR_END}")
+                continue
+            return move
 
-class AIPlayer(Player): # Gestion de l’algorithme de recherche selon la profondeur 
-  def __init__(self, color, depth=4):
-    super().__init__(color)
-    self.depth = depth
+class AIPlayer(Player):
+    # Gestion de l’algorithme de recherche selon la profondeur 
+    def __init__(self, color, depth=4):
+        super().__init__(color)
+        self.depth = depth
 
-  def get_move(self, board):
-    valid_moves = board.get_valid_moves(self.color)
-    if not valid_moves:
-      return None
-    return choose_move(board, self.color, depth=self.depth)
+    def get_move(self, board):
+        valid_moves = board.get_valid_moves(self.color)
+        if not valid_moves:
+            return None
+        return choose_move(board, self.color, depth=self.depth)
