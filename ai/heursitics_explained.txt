@@ -2,7 +2,7 @@ Heuristics are here to let the AI know what is best to play based on a score:
 
 Game phases:
   Depending on the game advencement (phase) actions don't have the same weight
-  - Phase 1 "opening": 64-44 empty cells -> emphasizes mobility and risk
+  - Phase 1 "opening": 60-44 empty cells -> emphasizes mobility and risk
   - Phase 2 "midgmae": 44-20 empty cells -> emphasizes mobility and board control
   - Phase 3 "endgame": 20-0 empty cells -> emphasizes discs count
 

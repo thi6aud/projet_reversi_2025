@@ -1,8 +1,10 @@
+import time
+import threading
 from game.board import Board, BLUE, PINK
 from game.player import HumanPlayer, AIPlayer
-from rich.console import Console
-from game.game_settings import get_gamemode
-from game.messages import *
+from ui.game_settings import get_gamemode
+from ui.game_sign import game_setup
+from ui.messages import *
 
 class GameManager:
   def __init__(self):
@@ -12,9 +14,11 @@ class GameManager:
     self.current_player = None
 
   def run(self):
-    print_slowly(MSG_WELCOME)
-    console.print()
-    print_slowly(MSG_AUTHORS)
+    blueAI_time = 0
+    pinkAI_time = 0
+    blueAI_moves = 0
+    pinkAI_moves = 0
+    game_setup()
     mode = get_gamemode()
     if mode == 1:
         self.player1 = HumanPlayer(BLUE)
@@ -54,9 +58,18 @@ class GameManager:
           stop_event = threading.Event()
           loader_thread = threading.Thread(target=ai_loader, args=(stop_event,))
           loader_thread.start()
+          start = time.time()
           move = self.current_player.get_move(self.board)
+          elapsed = time.time() - start
+          if self.current_player.color == BLUE:
+              blueAI_time += elapsed
+              blueAI_moves += 1
+          else:
+              pinkAI_time += elapsed
+              pinkAI_moves += 1
           stop_event.set()
           loader_thread.join()
+          console.print(f"[dim]AI thought for {elapsed * 1000:.1f} ms[/dim]")
       else:
           move = self.current_player.get_move(self.board)
       if move is None:
@@ -66,6 +79,13 @@ class GameManager:
       self.current_player = self.player1 if self.current_player == self.player2 else self.player2
     self.board.display()
     black_count, white_count = self.board.count_discs()
+    if blueAI_moves > 0:
+        avg_blue = (blueAI_time / blueAI_moves) * 1000
+        console.print(f"[cyan]Temps moyen IA BLUE : {avg_blue:.3f} ms ({blueAI_moves} coups)[/cyan]")
+
+    if pinkAI_moves > 0:
+        avg_pink = (pinkAI_time / pinkAI_moves) * 1000
+        console.print(f"[magenta]Temps moyen IA PINK : {avg_pink:.3f} ms ({pinkAI_moves} coups)[/magenta]")
     console.print(MSG_BLUEWINS if black_count > white_count 
           else MSG_PINKWINS if white_count > black_count 
           else MSG_TIE)

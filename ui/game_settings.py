@@ -1,4 +1,5 @@
 from rich.console import Console
+from ui.messages import print_slowly
 
 console = Console()
 
