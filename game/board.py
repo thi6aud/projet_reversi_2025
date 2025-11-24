@@ -72,6 +72,7 @@ class Board: # Initialisation du plateau du début de partie avec les 4 pions ce
             c += dc
 
           if self.inside(r, c) and self.grid[r][c] == player and found_opponent:
+            # exposer au format humain (col, row) -> ex: ("D", 3)
             valid_moves.append((chr(col + ord("A")), row + 1))
             break
 
@@ -80,15 +81,11 @@ class Board: # Initialisation du plateau du début de partie avec les 4 pions ce
   def inside(self, row, col):
     return 0 <= row < 8 and 0 <= col < 8
 
-<<<<<<< HEAD
   def apply_move(self, col, row, player): #Prend en compte le choix du joueur, vérifie s’il est parmi les coups valides place le jeton et retourne les jetons capturés 
     """
     Reçoit un coup au format humain (col lettre A–H, row 1–8), ex: ('D', 3).
     À l'intérieur on travaille en (row, col) 0-indexés.
     """
-=======
-  def apply_move(self, col, row, player):
->>>>>>> refs/remotes/origin/main
     col = col.upper()
     human_move = (col, row)
 
@@ -132,71 +129,10 @@ class Board: # Initialisation du plateau du début de partie avec les 4 pions ce
           clone_board.grid[row][col] = self.grid[row][col]
       return clone_board
 
-<<<<<<< HEAD
   def is_terminal(self): #vérifie s’il reste des coups valides pour les 2 joueurs, renvoie True si aucun coups possibles donc fin de partie 
-=======
-  def make_move(self, move, player):
-      """
-      Applique un coup (col, row) sans cloner.
-      Retourne la liste des positions retournées pour undo.
-      move = (colLetter, rowNumber)
-      """
-      col, row = move
-      col = col.upper()
-
-      flipped = []
-
-      # Convert to 0-based indices
-      r = row - 1
-      c = ord(col) - ord("A")
-
-      # Place the stone
-      self.grid[r][c] = player
-
-      # Explore all directions
-      for dr, dc in DIRECTIONS:
-          rr = r + dr
-          cc = c + dc
-
-          temp = []
-
-          # Follow opponent pieces
-          while self.inside(rr, cc) and self.grid[rr][cc] == -player:
-              temp.append((rr, cc))
-              rr += dr
-              cc += dc
-
-          # If we end on player's own piece, flip the chain
-          if self.inside(rr, cc) and self.grid[rr][cc] == player and len(temp) > 0:
-              for pos in temp:
-                  self.grid[pos[0]][pos[1]] = player
-              flipped.extend(temp)
-
-      return flipped
-
-  def undo_move(self, move, flipped, player):
-      """
-      Annule un coup joué par make_move.
-      move = (colLetter, rowNumber)
-      flipped = liste des positions retournées
-      """
-      col, row = move
-      col = col.upper()
-
-      r = row - 1
-      c = ord(col) - ord("A")
-
-      # Remove the placed stone
-      self.grid[r][c] = EMPTY
-
-      # Undo flips: restore opponent's color
-      for (rr, cc) in flipped:
-          self.grid[rr][cc] = -player
-
-  def is_terminal(self):
->>>>>>> refs/remotes/origin/main
       return not self.get_valid_moves(BLUE) and not self.get_valid_moves(PINK)
 
-  def score(self, player): #Calcul le score du joueur qui est la différence entre les jetons du joueur moins ceux de l’adversaire 
+  def score(self, player): # calcul le score du joueur = la différence entre les jetons du joueur moins ceux de l’adversaire 
+
     blue_count, pink_count = self.count_discs()
     return (blue_count - pink_count) if player == BLUE else (pink_count - blue_count)
