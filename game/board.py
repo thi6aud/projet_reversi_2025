@@ -1,4 +1,4 @@
-from rich.table import Table
+from rich.table import Table # Bibliothèque rich pour l'aspect visuel du plateau
 from rich.console import Console
 from rich import box
 
@@ -12,7 +12,7 @@ DIRECTIONS = [(-1, -1), (-1, 0), (-1, 1),
               (0, -1),           (0, 1),
               (1, -1),  (1, 0),  (1, 1)]
 
-class Board:
+class Board: # Initialisation du plateau du début de partie avec les 4 pions centraux
   def __init__(self):
     # grid[row][col]  -> row/ligne d'abord, col/colonne ensuite
     self.grid = [[EMPTY for _ in range(8)] for _ in range(8)]
@@ -53,7 +53,7 @@ class Board:
     console.print(table)
     console.print(f"[bold white]Blue:[/bold white] [bright_cyan]{blue_count}[/bright_cyan] - [bold white]Pink:[/bold white] [bright_magenta]{pink_count}[/bright_magenta]")
 
-  def get_valid_moves(self, player):
+  def get_valid_moves(self, player): # Vérifie les mouvement possibles et proposent ceux qui permettent de capturer au moins un jeton adverse.
     valid_moves = []
 
     for row in range(8):
@@ -81,7 +81,7 @@ class Board:
   def inside(self, row, col):
     return 0 <= row < 8 and 0 <= col < 8
 
-  def apply_move(self, col, row, player):
+  def apply_move(self, col, row, player): #Prend en compte le choix du joueur, vérifie s’il est parmi les coups valides place le jeton et retourne les jetons capturés 
     """
     Reçoit un coup au format humain (col lettre A–H, row 1–8), ex: ('D', 3).
     À l'intérieur on travaille en (row, col) 0-indexés.
@@ -129,9 +129,9 @@ class Board:
           clone_board.grid[row][col] = self.grid[row][col]
       return clone_board
 
-  def is_terminal(self):
+  def is_terminal(self): #vérifie s’il reste des coups valides pour les 2 joueurs, renvoie True si aucun coups possibles donc fin de partie 
       return not self.get_valid_moves(BLUE) and not self.get_valid_moves(PINK)
 
-  def score(self, player):
+  def score(self, player): #Calcul le score du joueur qui est la différence entre les jetons du joueur moins ceux de l’adversaire 
     blue_count, pink_count = self.count_discs()
     return (blue_count - pink_count) if player == BLUE else (pink_count - blue_count)
