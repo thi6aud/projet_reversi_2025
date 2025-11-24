@@ -1,12 +1,12 @@
 # Reversi 2025
 
-Ce projet est une implémentation du jeu Reversi/Othello en Python, avec une interface console et une IA basée sur Minimax.
+Ce projet est une implémentation du jeu Reversi en Python, avec une interface console et une IA basée sur Minimax.
 
 ## Installation
 
 1. Clonez le dépôt :
    ```sh
-   git clone <url_du_repo>
+   git clone https://github.com/thi6aud/projet_reversi_2025.git
    cd projet_reversi_2025
    ```
 2. Installez les dépendances :
