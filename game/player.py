@@ -9,7 +9,7 @@ class Player:
   def __init__(self, color):
     self.color = color
 
-class HumanPlayer(Player):
+class HumanPlayer(Player): # Gestion des coups valides du joueur humain
   def get_move(self, board):
     valid_moves = board.get_valid_moves(self.color)
     if not valid_moves:
@@ -37,7 +37,7 @@ class HumanPlayer(Player):
           continue
       return move
 
-class AIPlayer(Player):
+class AIPlayer(Player): # Gestion de l’algorithme de recherche selon la profondeur 
   def __init__(self, color, depth=4):
     super().__init__(color)
     self.depth = depth
