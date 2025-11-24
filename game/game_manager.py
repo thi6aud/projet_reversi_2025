@@ -6,7 +6,9 @@ from ui.game_settings import get_gamemode
 from ui.game_sign import game_setup
 from ui.messages import *
 
-class GameManager:
+class GameManager: 
+  #Gestion du jeu avec initialisation du plateau et des joueurs, 
+  #déroulement des tours, gestion des mouvements, et détermination du vainqueur.
   def __init__(self):
     self.board = Board()
     self.player1 = None
@@ -19,7 +21,7 @@ class GameManager:
     blueAI_moves = 0
     pinkAI_moves = 0
     game_setup()
-    mode = get_gamemode()
+    mode = get_gamemode() #Choix du mode de jeu par l'utilisateur , et de la profondeur de l'IA si nécessaire
     if mode == 1:
         self.player1 = HumanPlayer(BLUE)
         self.player2 = HumanPlayer(PINK)
