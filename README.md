@@ -1,6 +1,6 @@
 # Reversi 2025
 
-Ce projet est une implémentation du jeu Reversi en Python, avec une interface console et une IA basée sur Minimax.
+Ce projet est une implémentation du jeu Reversi en Python, avec une interface console et une IA basée sur Negamax.
 
 ## Installation
 

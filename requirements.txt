@@ -1,10 +1,11 @@
-Bibliothèques nécessaires pour faire tourner le projet : 
+# Bibliothèques nécessaires pour faire tourner le projet : 
 
-Python : version 3.8+ recommandée (3.10+ conseillée).
 
-pip install rich : nécessaire pour l’affichage en console .
+# Bibliothèque pour l'affichage en console
+rich>=13.4.0
 
-pip install pygame : optionnel, uniquement si vous utilisez l’interface graphique .
+# Optionnel : si vous utilisez l'interface graphique pygame
+# pygame>=2.1.3
 
-pip install pytest : optionnel, uniquement pour lancer les tests unitaires .
-
+# Optionnel (développement) : pour lancer les tests unitaires
+# pytest>=7.2.0
