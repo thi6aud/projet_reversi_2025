@@ -26,6 +26,10 @@ class BenchmarkGame:
     
     def run(self):
         """Lance la partie et retourne les statistiques"""
+        # Importer ici pour accéder à la transposition table
+        from ai.minimax import TT
+        TT.clear()  # Vider la table de transposition
+        
         while True:
             if not self.board.get_valid_moves(self.player1.color) and not self.board.get_valid_moves(self.player2.color):
                 break
@@ -132,7 +136,7 @@ class Benchmark:
                 result = game.run()
                 self.results.append(result)
                 
-                progress.update(task, advance=1)
+                progress.update(task, advance=1, description=f"Partie {i+1}/{num_games}")
         
         self._display_batch_summary(self.results[-num_games:], batch_name)
     
@@ -208,6 +212,148 @@ class Benchmark:
         console.print(table)
 
 
+def get_player_config(player_num):
+    """Demande à l'utilisateur la configuration d'un joueur"""
+    console.print(f"\n[bold cyan]Configuration du Joueur {player_num}[/bold cyan]")
+    console.print("Types disponibles :")
+    console.print("  1 - IA (Minimax)")
+    console.print("  2 - RandomAI")
+    
+    while True:
+        choice = input("Choix (1 ou 2) : ").strip()
+        if choice == '1':
+            player_type = 'AI'
+            console.print("\n[bold]Profondeurs recommandées :[/bold]")
+            console.print("  [green]• 2 : rapide (~2-3 sec/partie)[/green] ⭐ RECOMMANDÉ")
+            console.print("  [yellow]• 3 : moyen (~5-10 sec/partie)[/yellow]")
+            console.print("  [red]• 4+ : très lent (>30 sec/partie)[/red]")
+            while True:
+                try:
+                    depth = int(input("\nProfondeur (1-8) : ").strip())
+                    if 1 <= depth <= 8:
+                        if depth >= 4:
+                            confirm = input(f"[red]⚠️ Profondeur {depth} sera TRÈS lente (>30 sec/partie)[/red]\nConfirmer ? (o/n) : ").strip().lower()
+                            if confirm == 'o':
+                                return {'type': player_type, 'depth': depth}
+                        else:
+                            return {'type': player_type, 'depth': depth}
+                    else:
+                        console.print("[yellow]Veuillez entrer une valeur entre 1 et 8[/yellow]")
+                except ValueError:
+                    console.print("[yellow]Veuillez entrer un nombre[/yellow]")
+        elif choice == '2':
+            return {'type': 'RandomAI'}
+        else:
+            console.print("[yellow]Choix invalide. Entrez 1 ou 2[/yellow]")
+
+
+def get_num_games():
+    """Demande à l'utilisateur le nombre de parties"""
+    while True:
+        try:
+            num = int(input("\nNombre de parties à jouer : ").strip())
+            if num > 0:
+                return num
+            else:
+                console.print("[yellow]Le nombre doit être positif[/yellow]")
+        except ValueError:
+            console.print("[yellow]Veuillez entrer un nombre[/yellow]")
+
+
+def get_output_filename():
+    """Demande à l'utilisateur le nom du fichier de sortie"""
+    default = "benchmark_results.csv"
+    filename = input(f"\nNom du fichier CSV (défaut: {default}) : ").strip()
+    return filename if filename else default
+
+
+def interactive_mode():
+    """Mode interactif pour configurer et lancer les batteries de tests"""
+    console.print("[bold green]╔════════════════════════════════════════╗[/bold green]")
+    console.print("[bold green]║   MODE BENCHMARK - BATTERIE DE TESTS   ║[/bold green]")
+    console.print("[bold green]╚════════════════════════════════════════╝[/bold green]")
+    
+    # Proposer des presets rapides
+    console.print("\n[bold cyan]Voulez-vous utiliser un preset rapide ?[/bold cyan]")
+    console.print("  1 - RandomAI vs IA(2) - Rapide (~2.5s/partie) ⭐")
+    console.print("  2 - IA(2) vs IA(2) - Moyen (~3s/partie)")
+    console.print("  3 - Configuration personnalisée")
+    
+    preset_choice = input("Choix (1, 2 ou 3) : ").strip()
+    
+    if preset_choice == '1':
+        player1_config = {'type': 'RandomAI'}
+        player2_config = {'type': 'AI', 'depth': 2}
+    elif preset_choice == '2':
+        player1_config = {'type': 'AI', 'depth': 2}
+        player2_config = {'type': 'AI', 'depth': 2}
+    else:
+        # Configuration personnalisée
+        player1_config = get_player_config(1)
+        player2_config = get_player_config(2)
+    
+    # Récupérer le nombre de parties
+    num_games = get_num_games()
+    
+    # Estimer le temps
+    estimated_time = estimate_benchmark_time(num_games, player1_config, player2_config)
+    console.print(f"\n[dim]⏱️  Temps estimé : {estimated_time}[/dim]")
+    
+    output_file = get_output_filename()
+    
+    # Créer une description de la batterie
+    batch_name = f"{Benchmark._describe_config(player1_config)} vs {Benchmark._describe_config(player2_config)}"
+    
+    # Lancer le benchmark
+    benchmark = Benchmark(output_file=output_file)
+    benchmark.run_batch(num_games, player1_config, player2_config, batch_name=batch_name)
+    benchmark.save_results()
+    
+    console.print("[bold green]✓ Benchmark terminé ![/bold green]")
+
+
+def estimate_benchmark_time(num_games, player1_config, player2_config):
+    """Estime le temps approximatif d'une batterie"""
+    # Estimations moyennes en secondes par partie (CONSERVATRICES)
+    time_estimates = {
+        ('RandomAI', 'RandomAI'): 0.5,
+        ('RandomAI', 'AI_1'): 1,
+        ('RandomAI', 'AI_2'): 2.5,
+        ('RandomAI', 'AI_3'): 7,
+        ('RandomAI', 'AI_4'): 25,
+        ('RandomAI', 'AI_5'): 60,
+        ('AI_1', 'AI_1'): 1.5,
+        ('AI_1', 'AI_2'): 3,
+        ('AI_2', 'AI_2'): 3,
+        ('AI_2', 'AI_3'): 12,
+        ('AI_2', 'AI_4'): 40,
+        ('AI_3', 'AI_3'): 20,
+        ('AI_3', 'AI_4'): 60,
+        ('AI_4', 'AI_4'): 120,
+    }
+    
+    def get_key(config):
+        if config['type'] == 'RandomAI':
+            return 'RandomAI'
+        else:
+            return f"AI_{config['depth']}"
+    
+    key = (get_key(player1_config), get_key(player2_config))
+    time_per_game = time_estimates.get(key, time_estimates.get((key[1], key[0]), 15))
+    
+    total_seconds = time_per_game * num_games
+    
+    if total_seconds < 60:
+        return f"{int(total_seconds)}s"
+    elif total_seconds < 3600:
+        mins = int(total_seconds / 60)
+        secs = int(total_seconds % 60)
+        return f"{mins}m {secs}s"
+    else:
+        hours = total_seconds / 3600
+        return f"{hours:.1f}h"
+
+
 def main():
     """Exemple d'utilisation du benchmark"""
     benchmark = Benchmark(output_file="benchmark_results.csv")
@@ -248,4 +394,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    interactive_mode()

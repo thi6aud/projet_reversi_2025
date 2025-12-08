@@ -1,0 +1,3 @@
+timestamp,player1_type,player1_depth,player2_type,player2_depth,winner,blue_score,pink_score,winner_score,loser_score,player1_total_time,player1_moves,player1_avg_time_ms,player2_total_time,player2_moves,player2_avg_time_ms
+2025-12-08T10:59:35.112552,AIPlayer,2,RandomAI,-,BLUE,41,23,41,23,3.299,30,110.0,0.011,30,0.4
+2025-12-08T10:59:38.219792,AIPlayer,2,RandomAI,-,BLUE,42,22,42,22,3.035,31,97.9,0.011,29,0.4

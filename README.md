@@ -49,23 +49,33 @@ pytest
 
 Pour collecter des données d'efficacité et comparer différentes configurations d'IA, utilisez le script `benchmark.py` :
 
+### Mode interactif (recommandé pour démarrer)
+
 ```bash
 python benchmark.py
 ```
 
-Ce script :
-- Lance plusieurs batteries de parties (IA vs IA avec différentes profondeurs)
-- Mesure les temps d'exécution et nombre de coups
-- Enregistre les résultats dans un fichier CSV (`benchmark_results.csv`)
+Le script vous posera des questions :
+- Nombre de parties à jouer
+- Type de joueur 1 (IA Minimax ou RandomAI)
+- Profondeur de l'IA (si IA Minimax)
+- Type de joueur 2 (IA Minimax ou RandomAI)
+- Profondeur (si IA Minimax)
+- Nom du fichier CSV de sortie
 
-### Personnaliser les batteries
+### Mode programmatique (pour scripts automatisés)
 
-Modifiez la fonction `main()` dans `benchmark.py` pour adapter les configurations. Par exemple :
+Créez un fichier Python avec votre propre script :
 
 ```python
+from benchmark import Benchmark
+
+benchmark = Benchmark(output_file="mes_resultats.csv")
+
+# Lancer plusieurs configurations
 configs = [
-    ({'type': 'AI', 'depth': 4}, {'type': 'AI', 'depth': 3}, "IA Depth 4 vs IA Depth 3"),
-    ({'type': 'RandomAI'}, {'type': 'AI', 'depth': 4}, "Random vs IA Depth 4"),
+    ({'type': 'AI', 'depth': 4}, {'type': 'AI', 'depth': 3}, "IA Depth 4 vs 3"),
+    ({'type': 'AI', 'depth': 5}, {'type': 'RandomAI'}, "IA Depth 5 vs Random"),
 ]
 benchmark.run_multi_batch(10, configs)  # 10 parties par config
 benchmark.save_results()
@@ -73,7 +83,7 @@ benchmark.save_results()
 
 ### Format du CSV
 
-Le fichier `benchmark_results.csv` contient les colonnes :
+Le fichier CSV contient les colonnes suivantes :
 - `timestamp` — quand la partie a été jouée
 - `player1_type`, `player1_depth` — type et profondeur du joueur 1 (BLUE)
 - `player2_type`, `player2_depth` — type et profondeur du joueur 2 (PINK)
@@ -81,6 +91,8 @@ Le fichier `benchmark_results.csv` contient les colonnes :
 - `blue_score`, `pink_score` — scores finals
 - `player1_total_time`, `player1_moves`, `player1_avg_time_ms` — stats temps joueur 1
 - `player2_total_time`, `player2_moves`, `player2_avg_time_ms` — stats temps joueur 2
+
+Les résultats sont facilement exploitables pour des analyses statistiques dans Excel ou Python.
 
 ## Contribuer
 
