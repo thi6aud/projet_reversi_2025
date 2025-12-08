@@ -1,0 +1,6 @@
+timestamp,player1_type,player1_depth,player2_type,player2_depth,winner,blue_score,pink_score,winner_score,loser_score,player1_total_time,player1_moves,player1_avg_time_ms,player2_total_time,player2_moves,player2_avg_time_ms
+2025-12-08T13:00:58.336670,RandomAI,-,AIPlayer,2,PINK,7,56,56,7,0.01,29,0.3,2.149,30,71.6
+2025-12-08T13:01:00.951862,RandomAI,-,AIPlayer,2,PINK,15,49,49,15,0.009,30,0.3,2.554,30,85.1
+2025-12-08T13:01:03.462348,RandomAI,-,AIPlayer,2,BLUE,36,28,36,28,0.007,31,0.2,2.446,29,84.3
+2025-12-08T13:01:05.803415,RandomAI,-,AIPlayer,2,PINK,21,43,43,21,0.009,30,0.3,2.278,30,75.9
+2025-12-08T13:01:08.407200,RandomAI,-,AIPlayer,2,PINK,13,51,51,13,0.01,30,0.3,2.53,30,84.3
