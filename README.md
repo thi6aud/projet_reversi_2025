@@ -45,6 +45,43 @@ pip install pytest  # si nécessaire
 pytest
 ```
 
+## 📊 Benchmark — Batteries de tests
+
+Pour collecter des données d'efficacité et comparer différentes configurations d'IA, utilisez le script `benchmark.py` :
+
+```bash
+python benchmark.py
+```
+
+Ce script :
+- Lance plusieurs batteries de parties (IA vs IA avec différentes profondeurs)
+- Mesure les temps d'exécution et nombre de coups
+- Enregistre les résultats dans un fichier CSV (`benchmark_results.csv`)
+
+### Personnaliser les batteries
+
+Modifiez la fonction `main()` dans `benchmark.py` pour adapter les configurations. Par exemple :
+
+```python
+configs = [
+    ({'type': 'AI', 'depth': 4}, {'type': 'AI', 'depth': 3}, "IA Depth 4 vs IA Depth 3"),
+    ({'type': 'RandomAI'}, {'type': 'AI', 'depth': 4}, "Random vs IA Depth 4"),
+]
+benchmark.run_multi_batch(10, configs)  # 10 parties par config
+benchmark.save_results()
+```
+
+### Format du CSV
+
+Le fichier `benchmark_results.csv` contient les colonnes :
+- `timestamp` — quand la partie a été jouée
+- `player1_type`, `player1_depth` — type et profondeur du joueur 1 (BLUE)
+- `player2_type`, `player2_depth` — type et profondeur du joueur 2 (PINK)
+- `winner` — gagnant (`BLUE`, `PINK`, ou `TIE`)
+- `blue_score`, `pink_score` — scores finals
+- `player1_total_time`, `player1_moves`, `player1_avg_time_ms` — stats temps joueur 1
+- `player2_total_time`, `player2_moves`, `player2_avg_time_ms` — stats temps joueur 2
+
 ## Contribuer
 
 Si tu veux améliorer le projet :
