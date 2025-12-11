@@ -85,12 +85,21 @@ benchmark.save_results()
 
 Le fichier CSV contient les colonnes suivantes :
 - `timestamp` — quand la partie a été jouée
+- `blue_starts` — qui a commencé (True = BLUE/Player1, False = PINK/Player2)
 - `player1_type`, `player1_depth` — type et profondeur du joueur 1 (BLUE)
 - `player2_type`, `player2_depth` — type et profondeur du joueur 2 (PINK)
 - `winner` — gagnant (`BLUE`, `PINK`, ou `TIE`)
 - `blue_score`, `pink_score` — scores finals
 - `player1_total_time`, `player1_moves`, `player1_avg_time_ms` — stats temps joueur 1
 - `player2_total_time`, `player2_moves`, `player2_avg_time_ms` — stats temps joueur 2
+
+### Caractéristiques du benchmark
+
+- **Alternance des couleurs** : chaque joueur commence alternativement (partie 1 = BLUE, partie 2 = PINK, etc.) pour évaluer équitablement les deux côtés
+- **Aléatoire dans l'IA** : quand plusieurs coups ont la même valeur d'évaluation, l'IA en choisit un aléatoirement pour créer de la variabilité entre les parties
+- **Table de transposition vidée** : entre chaque partie pour éviter les biais dus à la cache
+
+Ces optimisations garantissent que les tests sont **fiables et non-déterministes**, permettant d'évaluer correctement les performances d'une IA.
 
 Les résultats sont facilement exploitables pour des analyses statistiques dans Excel ou Python.
 

@@ -1,5 +1,6 @@
 from ai.heuristics import evaluate
 from ai.heuristics_consts import *
+import random
 
 def choose_move(board, player, depth):
     valid_moves = board.get_valid_moves(player)
@@ -10,8 +11,18 @@ def choose_move(board, player, depth):
         score = -search(board, -player, depth - 1)
         board.undo_move(move, flipped, player)
         return score
-    best_move = max(valid_moves, key=evaluate_move)
-    return best_move
+    
+    # Évaluer tous les coups
+    move_scores = [(move, evaluate_move(move)) for move in valid_moves]
+    
+    # Trouver le meilleur score
+    best_score = max(score for _, score in move_scores)
+    
+    # Sélectionner tous les coups avec le meilleur score
+    best_moves = [move for move, score in move_scores if score == best_score]
+    
+    # Si plusieurs coups ont le même score, en choisir un aléatoirement
+    return random.choice(best_moves)
 
 TT = {}
 

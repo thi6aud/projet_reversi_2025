@@ -14,10 +14,20 @@ console = Console()
 class BenchmarkGame:
     """Lance une partie silencieusement (sans affichage) et retourne les statistiques"""
     
-    def __init__(self, player1, player2):
+    def __init__(self, player1, player2, swap_colors=False):
         self.board = Board()
-        self.player1 = player1
-        self.player2 = player2
+        self.swap_colors = swap_colors
+        
+        # Alterner les couleurs si demandé
+        if swap_colors:
+            self.player1 = player2
+            self.player2 = player1
+            self.player1.color = BLUE
+            self.player2.color = PINK
+        else:
+            self.player1 = player1
+            self.player2 = player2
+        
         self.current_player = self.player1
         self.player1_time = 0
         self.player1_moves = 0
@@ -76,6 +86,7 @@ class BenchmarkGame:
         
         return {
             'timestamp': datetime.now().isoformat(),
+            'blue_starts': not self.swap_colors,  # True si BLUE commence (player1 original)
             'player1_type': self._get_player_type(self.player1),
             'player1_depth': getattr(self.player1, 'depth', '-'),
             'player2_type': self._get_player_type(self.player2),
@@ -132,7 +143,10 @@ class Benchmark:
                 player1 = self._create_player(player1_config, BLUE)
                 player2 = self._create_player(player2_config, PINK)
                 
-                game = BenchmarkGame(player1, player2)
+                # Alterner qui commence : partie paire/impaire
+                swap_colors = (i % 2 == 1)
+                
+                game = BenchmarkGame(player1, player2, swap_colors=swap_colors)
                 result = game.run()
                 self.results.append(result)
                 
@@ -191,23 +205,41 @@ class Benchmark:
         if not results:
             return
         
-        blue_wins = sum(1 for r in results if r['winner'] == 'BLUE')
-        pink_wins = sum(1 for r in results if r['winner'] == 'PINK')
-        ties = sum(1 for r in results if r['winner'] == 'TIE')
+        # Compter les victoires par joueur (pas par couleur)
+        player1_wins = 0
+        player2_wins = 0
+        ties = 0
         
-        avg_blue_score = sum(r['blue_score'] for r in results) / len(results)
-        avg_pink_score = sum(r['pink_score'] for r in results) / len(results)
+        for r in results:
+            # Déterminer qui a gagné basé sur les couleurs et qui a commencé
+            blue_starts = r['blue_starts']
+            winner = r['winner']
+            
+            if winner == 'TIE':
+                ties += 1
+            elif (winner == 'BLUE' and blue_starts) or (winner == 'PINK' and not blue_starts):
+                # BLUE gagne ET BLUE commence => Player1 gagne
+                # PINK gagne ET PINK commence => Player1 gagne
+                player1_wins += 1
+            else:
+                player2_wins += 1
+        
+        player1_type = results[0]['player1_type']
+        player1_depth = results[0]['player1_depth']
+        player2_type = results[0]['player2_type']
+        player2_depth = results[0]['player2_depth']
+        
+        player1_name = f"{player1_type}(d={player1_depth})" if player1_depth != '-' else player1_type
+        player2_name = f"{player2_type}(d={player2_depth})" if player2_depth != '-' else player2_type
         
         table = Table(title=f"Résumé : {batch_name}")
         table.add_column("Statistique", style="cyan")
         table.add_column("Valeur", style="magenta")
         
         table.add_row("Total parties", str(len(results)))
-        table.add_row("Victoires BLUE", f"{blue_wins} ({blue_wins/len(results)*100:.1f}%)")
-        table.add_row("Victoires PINK", f"{pink_wins} ({pink_wins/len(results)*100:.1f}%)")
+        table.add_row(f"Victoires {player1_name}", f"{player1_wins} ({player1_wins/len(results)*100:.1f}%)")
+        table.add_row(f"Victoires {player2_name}", f"{player2_wins} ({player2_wins/len(results)*100:.1f}%)")
         table.add_row("Égalités", f"{ties} ({ties/len(results)*100:.1f}%)")
-        table.add_row("Score moyen BLUE", f"{avg_blue_score:.1f}")
-        table.add_row("Score moyen PINK", f"{avg_pink_score:.1f}")
         
         console.print(table)
 
