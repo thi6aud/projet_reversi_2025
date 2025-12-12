@@ -1,0 +1,2 @@
+timestamp,blue_starts,player1_type,player1_depth,player2_type,player2_depth,winner,blue_score,pink_score,winner_score,loser_score,player1_total_time,player1_moves,player1_avg_time_ms,player2_total_time,player2_moves,player2_avg_time_ms,rss_before_mb,rss_after_mb,rss_peak_mb,player1_rss_peak_mb,player2_rss_peak_mb,tracemalloc_current_kb,tracemalloc_peak_kb,player1_tracemalloc_peak_kb,player2_tracemalloc_peak_kb
+2025-12-11T18:05:37.005912,True,RandomAI,-,AIPlayer,2,PINK,19,45,45,19,0.002,29,0.1,0.762,31,24.6,30.67,31.3,31.3,31.3,31.3,367,368,368,368

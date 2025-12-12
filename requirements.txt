@@ -3,6 +3,7 @@
 
 # Bibliothèque pour l'affichage en console
 rich>=13.4.0
+psutil>=5.9.0
 
 # Optionnel : si vous utilisez l'interface graphique pygame
 # pygame>=2.1.3

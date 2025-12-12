@@ -8,6 +8,8 @@ from game.player import AIPlayer, RandomAIPlayer
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.table import Table
+import psutil
+import tracemalloc
 
 console = Console()
 
@@ -33,40 +35,101 @@ class BenchmarkGame:
         self.player1_moves = 0
         self.player2_time = 0
         self.player2_moves = 0
+        # Métriques mémoire par joueur (pics observés pendant leurs coups)
+        self.player1_rss_peak = 0
+        self.player2_rss_peak = 0
+        self.player1_tracemalloc_peak = 0
+        self.player2_tracemalloc_peak = 0
+        # pour calculer la moyenne par coup
+        self.player1_rss_sum = 0
+        self.player2_rss_sum = 0
+        self.player1_tr_sum = 0
+        self.player2_tr_sum = 0
     
     def run(self):
         """Lance la partie et retourne les statistiques"""
         # Importer ici pour accéder à la transposition table
         from ai.minimax import TT
         TT.clear()  # Vider la table de transposition
-        
+        # Démarrer le suivi mémoire
+        proc = psutil.Process()
+        tracemalloc.start()
+        rss_before = proc.memory_info().rss
+        rss_peak = rss_before
+        # initialiser les pics par joueur avec l'empreinte initiale
+        self.player1_rss_peak = rss_before
+        self.player2_rss_peak = rss_before
+        try:
+            tr_current_init, tr_peak_init = tracemalloc.get_traced_memory()
+        except Exception:
+            tr_current_init, tr_peak_init = 0, 0
+        self.player1_tracemalloc_peak = tr_peak_init
+        self.player2_tracemalloc_peak = tr_peak_init
+
+        # Boucle de jeu
         while True:
             if not self.board.get_valid_moves(self.player1.color) and not self.board.get_valid_moves(self.player2.color):
                 break
-            
+
             valid_moves = self.board.get_valid_moves(self.current_player.color)
             if not valid_moves:
                 # Passer le tour
                 self.current_player = self.player1 if self.current_player == self.player2 else self.player2
                 continue
-            
+
             # Mesurer le temps du mouvement
             start = time.time()
             move = self.current_player.get_move(self.board)
             elapsed = time.time() - start
-            
+
             if self.current_player == self.player1:
                 self.player1_time += elapsed
                 self.player1_moves += 1
             else:
                 self.player2_time += elapsed
                 self.player2_moves += 1
-            
+
             if move is not None:
                 self.board.apply_move(move[0], move[1], self.current_player.color)
-            
+
+            # échantillonner la mémoire résidente pour estimer le pic
+            try:
+                rss_now = proc.memory_info().rss
+                if rss_now > rss_peak:
+                    rss_peak = rss_now
+                # échantillonner tracemalloc et attribuer les pics au joueur courant
+                try:
+                    tr_now, tr_peak_sample = tracemalloc.get_traced_memory()
+                    if self.current_player == self.player1:
+                        if rss_now > self.player1_rss_peak:
+                            self.player1_rss_peak = rss_now
+                        if tr_peak_sample > self.player1_tracemalloc_peak:
+                            self.player1_tracemalloc_peak = tr_peak_sample
+                        # accumuler pour moyenne par coup
+                        self.player1_rss_sum += rss_now
+                        self.player1_tr_sum += tr_peak_sample
+                    else:
+                        if rss_now > self.player2_rss_peak:
+                            self.player2_rss_peak = rss_now
+                        if tr_peak_sample > self.player2_tracemalloc_peak:
+                            self.player2_tracemalloc_peak = tr_peak_sample
+                        # accumuler pour moyenne par coup
+                        self.player2_rss_sum += rss_now
+                        self.player2_tr_sum += tr_peak_sample
+                except Exception:
+                    # si tracemalloc pose problème, on ignore
+                    pass
+            except Exception:
+                # protection : si psutil échoue, on ignore
+                pass
+
             # Alterner les joueurs
             self.current_player = self.player1 if self.current_player == self.player2 else self.player2
+
+        # Fin de partie : arrêter tracemalloc et collecter les métriques
+        tr_current, tr_peak = tracemalloc.get_traced_memory()
+        tracemalloc.stop()
+        rss_after = proc.memory_info().rss
         
         blue_count, pink_count = self.board.count_discs()
         
@@ -102,6 +165,20 @@ class BenchmarkGame:
             'player2_total_time': round(self.player2_time, 3),
             'player2_moves': self.player2_moves,
             'player2_avg_time_ms': round((self.player2_time / self.player2_moves * 1000) if self.player2_moves > 0 else 0, 1),
+            'rss_before_mb': round(rss_before / 1024**2, 2),
+            'rss_after_mb': round(rss_after / 1024**2, 2),
+            'rss_peak_mb': round(rss_peak / 1024**2, 2),
+            'player1_rss_peak_mb': round(self.player1_rss_peak / 1024**2, 2),
+            'player2_rss_peak_mb': round(self.player2_rss_peak / 1024**2, 2),
+            'tracemalloc_current_kb': int(tr_current / 1024),
+            'tracemalloc_peak_kb': int(tr_peak / 1024),
+            'player1_tracemalloc_peak_kb': int(self.player1_tracemalloc_peak / 1024),
+            'player2_tracemalloc_peak_kb': int(self.player2_tracemalloc_peak / 1024),
+            # Moyennes par coup (MB pour RSS, KB pour tracemalloc)
+            'player1_rss_avg_per_move_mb': round((self.player1_rss_sum / self.player1_moves) / 1024**2, 3) if self.player1_moves > 0 else 0.0,
+            'player2_rss_avg_per_move_mb': round((self.player2_rss_sum / self.player2_moves) / 1024**2, 3) if self.player2_moves > 0 else 0.0,
+            'player1_tracemalloc_avg_per_move_kb': int((self.player1_tr_sum / self.player1_moves) / 1024) if self.player1_moves > 0 else 0,
+            'player2_tracemalloc_avg_per_move_kb': int((self.player2_tr_sum / self.player2_moves) / 1024) if self.player2_moves > 0 else 0,
         }
     
     @staticmethod
@@ -240,6 +317,33 @@ class Benchmark:
         table.add_row(f"Victoires {player1_name}", f"{player1_wins} ({player1_wins/len(results)*100:.1f}%)")
         table.add_row(f"Victoires {player2_name}", f"{player2_wins} ({player2_wins/len(results)*100:.1f}%)")
         table.add_row("Égalités", f"{ties} ({ties/len(results)*100:.1f}%)")
+        # Calculer les consommations mémoire par joueur (moyennes sur la batterie)
+        p1_rss_peaks = [r.get('player1_rss_peak_mb', 0) for r in results]
+        p2_rss_peaks = [r.get('player2_rss_peak_mb', 0) for r in results]
+        p1_tr_peaks = [r.get('player1_tracemalloc_peak_kb', 0) for r in results]
+        p2_tr_peaks = [r.get('player2_tracemalloc_peak_kb', 0) for r in results]
+
+        if p1_rss_peaks:
+            p1_rss_avg = sum(p1_rss_peaks) / len(p1_rss_peaks)
+            p2_rss_avg = sum(p2_rss_peaks) / len(p2_rss_peaks)
+            p1_tr_avg = sum(p1_tr_peaks) / len(p1_tr_peaks)
+            p2_tr_avg = sum(p2_tr_peaks) / len(p2_tr_peaks)
+
+            table.add_row(f"Pic RSS moyen {player1_name}", f"{p1_rss_avg:.2f} MB")
+            table.add_row(f"Pic RSS moyen {player2_name}", f"{p2_rss_avg:.2f} MB")
+            table.add_row(f"Pic tracemalloc moyen {player1_name}", f"{p1_tr_avg:.1f} KB")
+            table.add_row(f"Pic tracemalloc moyen {player2_name}", f"{p2_tr_avg:.1f} KB")
+        # Moyenne mémoire par coup (moyennes des moyennes par partie)
+        p1_rss_avg_per_move = [r.get('player1_rss_avg_per_move_mb', 0) for r in results]
+        p2_rss_avg_per_move = [r.get('player2_rss_avg_per_move_mb', 0) for r in results]
+        p1_tr_avg_per_move = [r.get('player1_tracemalloc_avg_per_move_kb', 0) for r in results]
+        p2_tr_avg_per_move = [r.get('player2_tracemalloc_avg_per_move_kb', 0) for r in results]
+
+        if p1_rss_avg_per_move:
+            table.add_row(f"RSS moyen par coup {player1_name}", f"{(sum(p1_rss_avg_per_move)/len(p1_rss_avg_per_move)):.3f} MB")
+            table.add_row(f"RSS moyen par coup {player2_name}", f"{(sum(p2_rss_avg_per_move)/len(p2_rss_avg_per_move)):.3f} MB")
+            table.add_row(f"Tracemalloc moyen par coup {player1_name}", f"{(sum(p1_tr_avg_per_move)/len(p1_tr_avg_per_move)):.1f} KB")
+            table.add_row(f"Tracemalloc moyen par coup {player2_name}", f"{(sum(p2_tr_avg_per_move)/len(p2_tr_avg_per_move)):.1f} KB")
         
         console.print(table)
 

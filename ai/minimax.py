@@ -1,6 +1,10 @@
 from ai.heuristics import evaluate
 from ai.heuristics_consts import *
 import random
+from collections import OrderedDict
+
+# Transposition table with size limit to avoid unbounded memory growth
+MAX_TT_ENTRIES = 50000
 
 def choose_move(board, player, depth):
     valid_moves = board.get_valid_moves(player)
@@ -24,12 +28,15 @@ def choose_move(board, player, depth):
     # Si plusieurs coups ont le même score, en choisir un aléatoirement
     return random.choice(best_moves)
 
-TT = {}
+TT = OrderedDict()
 
 def search(board, player, depth, alpha=float('-inf'), beta=float('inf')):
-  key = (tuple(map(tuple, board.grid)), player, depth)
-  if key in TT:
-    return TT[key]
+  # Only build a TT key for depths >= 2 to reduce allocation overhead
+  key = None
+  if depth >= 2:
+    key = (tuple(map(tuple, board.grid)), player, depth)
+    if key in TT:
+      return TT[key]
   best_score = float('-inf')
   if board.is_terminal():
     return board.score(player)
@@ -50,7 +57,12 @@ def search(board, player, depth, alpha=float('-inf'), beta=float('inf')):
     alpha = max(alpha, child_score)
     if alpha >= beta:
         break
-  TT[key] = best_score
+  # store in TT if we constructed a key
+  if key is not None:
+    TT[key] = best_score
+    # maintain size limit
+    if len(TT) > MAX_TT_ENTRIES:
+      TT.popitem(last=False)
   return best_score
 
 def quick_eval(move):

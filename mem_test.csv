@@ -1,0 +1,2 @@
+timestamp,blue_starts,player1_type,player1_depth,player2_type,player2_depth,winner,blue_score,pink_score,winner_score,loser_score,player1_total_time,player1_moves,player1_avg_time_ms,player2_total_time,player2_moves,player2_avg_time_ms,rss_before_mb,rss_after_mb,rss_peak_mb,tracemalloc_current_kb,tracemalloc_peak_kb
+2025-12-11T18:00:22.002953,True,RandomAI,-,AIPlayer,2,PINK,14,50,50,14,0.002,29,0.1,0.673,31,21.7,30.31,31.02,31.02,315,316
