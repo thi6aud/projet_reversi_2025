@@ -1,0 +1,13 @@
+variant,use_tt,use_move_ordering,depth,time_sec,nodes_explored,rss_delta_mb,tracemalloc_peak_kb,tt_size,score
+"Base (pas TT, pas MO)      ",False,False,3,0.105,387,0.0,1,0,10.1
+TT seulement              ,True,False,3,0.105,387,0.0,10,10,10.1
+Move Ordering seulement  ,False,True,3,0.071,257,0.0,1,0,10.1
+TT + Move Ordering       ,True,True,3,0.07,257,0.0,2,10,10.1
+"Base (pas TT, pas MO)      ",False,False,4,0.41,1506,0.0,1,0,-1.6
+TT seulement              ,True,False,4,0.39,1506,0.03,45,53,-1.6
+Move Ordering seulement  ,False,True,4,0.237,928,0.0,1,0,-1.6
+TT + Move Ordering       ,True,True,4,0.24,928,0.0,7,39,-1.6
+"Base (pas TT, pas MO)      ",False,False,5,2.56,9055,0.0,1,0,10.35
+TT seulement              ,True,False,5,2.382,8901,0.42,286,320,10.35
+Move Ordering seulement  ,False,True,5,2.18,8014,0.0,1,0,10.35
+TT + Move Ordering       ,True,True,5,2.136,7876,0.0,98,298,10.35

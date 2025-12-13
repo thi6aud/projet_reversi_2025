@@ -33,7 +33,7 @@ TT = OrderedDict()
 def search(board, player, depth, alpha=float('-inf'), beta=float('inf')):
   # Only build a TT key for depths >= 2 to reduce allocation overhead
   key = None
-  if depth >= 2:
+    if depth >= 3:
     key = (tuple(map(tuple, board.grid)), player, depth)
     if key in TT:
       return TT[key]
@@ -45,9 +45,12 @@ def search(board, player, depth, alpha=float('-inf'), beta=float('inf')):
   valid_moves = board.get_valid_moves(player)
   if not valid_moves:
     return -search(board, -player, depth, -beta, -alpha)
-  def score(move):
-    return quick_eval(move)
-  valid_moves.sort(key=score, reverse=True)
+  
+  # Tri des coups: uniquement en profondeur suffisante pour amortir le coût
+  if depth >= 4:
+        scored_moves = [(move, quick_eval(move, board, player)) for move in valid_moves]
+        scored_moves.sort(key=lambda item: item[1], reverse=True)
+        valid_moves = [move for move, _ in scored_moves]
   for move in valid_moves:
     flipped = board.make_move(move, player)
     child_score = -search(board, -player, depth-1, -beta, -alpha)
@@ -65,20 +68,29 @@ def search(board, player, depth, alpha=float('-inf'), beta=float('inf')):
       TT.popitem(last=False)
   return best_score
 
-def quick_eval(move):
+def quick_eval(move, board=None, player=None):
+    """
+    Évalue un coup pour le tri des mouvements (move ordering).
+    Basé sur:
+    1. Nombre de disques retournés (principal)
+    2. Control des coins (très importants en Othello)
+    3. Pénalité pour les carrés dangereux
+    
+    Cette heuristique est bien plus pertinente que PST pour Othello.
+    """
     row, col = move
-
-    # Normaliser la colonne (lettre ou chiffre en string)
+    
+    # Normaliser la colonne
     if isinstance(col, str):
         col_str = col.strip().upper()
         if len(col_str) == 1 and col_str.isalpha():
-            col = ord(col_str) - ord('A')   # 'A'->0, 'B'->1, ...
+            col = ord(col_str) - ord('A')
         elif col_str.isdigit():
             col = int(col_str)
     if not isinstance(col, int):
-        col = 0  # valeur de secours
+        col = 0
 
-    # Normaliser la ligne (string -> int)
+    # Normaliser la ligne
     if isinstance(row, str):
         row_str = row.strip()
         if row_str.isdigit():
@@ -89,10 +101,39 @@ def quick_eval(move):
     elif isinstance(row, int):
         row_idx = row
     else:
-        row_idx = 0  # valeur de secours
+        row_idx = 0
 
-    # Bornage 0–7
     row_idx = max(0, min(7, row_idx))
     col = max(0, min(7, col))
 
-    return PST[row_idx][col]
+    score = 0
+
+    # 1. Bonus pour les coins (très importants en Othello)
+    corners = [(0, 0), (0, 7), (7, 0), (7, 7)]
+    if (row_idx, col) in corners:
+        score += 1000
+
+    # 2. Pénalité pour les carrés dangereux (adjacents aux coins vides)
+    # Ces carrés donnent à l'adversaire accès aux coins
+    dangerous = [
+        (0, 1), (1, 0), (1, 1),  # autour du coin (0,0)
+        (0, 6), (1, 6), (1, 7),  # autour du coin (0,7)
+        (6, 0), (6, 1), (7, 1),  # autour du coin (7,0)
+        (6, 6), (6, 7), (7, 6),  # autour du coin (7,7)
+    ]
+    if (row_idx, col) in dangerous:
+        score -= 500
+
+    # 3. Bonus pour les bords (X-squares) - bonne stabilité
+    edges = [(i, j) for i in range(8) for j in range(8) 
+             if i in (0, 7) or j in (0, 7)]
+    if (row_idx, col) in edges and (row_idx, col) not in corners and (row_idx, col) not in dangerous:
+        score += 50
+
+    # 4. Nombre de disques retournés (si board et player fournis)
+    if board is not None and player is not None:
+        flipped = board.make_move((row, col), player)
+        score += len(flipped) * 10  # Bonus proportionnel au nombre de disques retournés
+        board.undo_move((row, col), flipped, player)
+
+    return score
