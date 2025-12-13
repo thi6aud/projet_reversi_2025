@@ -30,10 +30,20 @@ def choose_move(board, player, depth):
 
 TT = OrderedDict()
 
+def get_game_phase(board):
+  """Détermine la phase du jeu basée sur le nombre de disques."""
+  total = sum(1 for row in board.grid for cell in row if cell != 0)
+  if total <= 12:
+    return 'opening'
+  elif total <= 48:
+    return 'midgame'
+  else:
+    return 'endgame'
+
 def search(board, player, depth, alpha=float('-inf'), beta=float('inf')):
-  # Only build a TT key for depths >= 2 to reduce allocation overhead
+  # Only build a TT key for depths >= 3 to reduce allocation overhead
   key = None
-    if depth >= 3:
+  if depth >= 3:
     key = (tuple(map(tuple, board.grid)), player, depth)
     if key in TT:
       return TT[key]
@@ -46,11 +56,12 @@ def search(board, player, depth, alpha=float('-inf'), beta=float('inf')):
   if not valid_moves:
     return -search(board, -player, depth, -beta, -alpha)
   
-  # Tri des coups: uniquement en profondeur suffisante pour amortir le coût
-  if depth >= 4:
-        scored_moves = [(move, quick_eval(move, board, player)) for move in valid_moves]
-        scored_moves.sort(key=lambda item: item[1], reverse=True)
-        valid_moves = [move for move, _ in scored_moves]
+  # Tri des coups: seulement en midgame et profondeur >= 4
+  phase = get_game_phase(board)
+  if depth >= 4 and phase == 'midgame':
+    scored_moves = [(move, quick_eval(move, board, player)) for move in valid_moves]
+    scored_moves.sort(key=lambda item: item[1], reverse=True)
+    valid_moves = [move for move, _ in scored_moves]
   for move in valid_moves:
     flipped = board.make_move(move, player)
     child_score = -search(board, -player, depth-1, -beta, -alpha)
