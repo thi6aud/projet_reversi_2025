@@ -6,27 +6,28 @@ from collections import OrderedDict
 # Transposition table with size limit to avoid unbounded memory growth
 MAX_TT_ENTRIES = 50000
 
-def choose_move(board, player, depth):
-    valid_moves = board.get_valid_moves(player)
-    if not valid_moves:
-        return None
-    def evaluate_move(move):
-        flipped = board.make_move(move, player)
-        score = -search(board, -player, depth - 1)
-        board.undo_move(move, flipped, player)
-        return score
-    
-    # Évaluer tous les coups
-    move_scores = [(move, evaluate_move(move)) for move in valid_moves]
-    
-    # Trouver le meilleur score
-    best_score = max(score for _, score in move_scores)
-    
-    # Sélectionner tous les coups avec le meilleur score
-    best_moves = [move for move, score in move_scores if score == best_score]
-    
-    # Si plusieurs coups ont le même score, en choisir un aléatoirement
-    return random.choice(best_moves)
+def choose_move(board, player, depth, weights=None):
+  valid_moves = board.get_valid_moves(player)
+  if not valid_moves:
+    return None
+
+  def evaluate_move(move):
+    flipped = board.make_move(move, player)
+    score = -search(board, -player, depth - 1, weights=weights)
+    board.undo_move(move, flipped, player)
+    return score
+
+  # Évaluer tous les coups
+  move_scores = [(move, evaluate_move(move)) for move in valid_moves]
+
+  # Trouver le meilleur score
+  best_score = max(score for _, score in move_scores)
+
+  # Sélectionner tous les coups avec le meilleur score
+  best_moves = [move for move, score in move_scores if score == best_score]
+
+  # Si plusieurs coups ont le même score, en choisir un aléatoirement
+  return random.choice(best_moves)
 
 TT = OrderedDict()
 
@@ -40,21 +41,21 @@ def get_game_phase(board):
   else:
     return 'endgame'
 
-def search(board, player, depth, alpha=float('-inf'), beta=float('inf')):
+def search(board, player, depth, alpha=float('-inf'), beta=float('inf'), weights=None):
   # Only build a TT key for depths >= 3 to reduce allocation overhead
   key = None
   if depth >= 3:
-    key = (tuple(map(tuple, board.grid)), player, depth)
+    key = (tuple(map(tuple, board.grid)), player, depth, id(weights) if weights is not None else None)
     if key in TT:
       return TT[key]
   best_score = float('-inf')
   if board.is_terminal():
     return board.score(player)
   if depth == 0:
-    return evaluate(board, player)
+    return evaluate(board, player, weights=weights)
   valid_moves = board.get_valid_moves(player)
   if not valid_moves:
-    return -search(board, -player, depth, -beta, -alpha)
+    return -search(board, -player, depth, -beta, -alpha, weights=weights)
   
   # Tri des coups: seulement en midgame et profondeur >= 4
   phase = get_game_phase(board)
@@ -64,7 +65,7 @@ def search(board, player, depth, alpha=float('-inf'), beta=float('inf')):
     valid_moves = [move for move, _ in scored_moves]
   for move in valid_moves:
     flipped = board.make_move(move, player)
-    child_score = -search(board, -player, depth-1, -beta, -alpha)
+    child_score = -search(board, -player, depth-1, -beta, -alpha, weights=weights)
     board.undo_move(move, flipped, player)
 
     best_score = max(best_score, child_score)

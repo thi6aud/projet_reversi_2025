@@ -11,44 +11,44 @@ def game_phase(board):
     else:
         return "endgame"
 
-def opening_game_evaluation(board, player):
-    score = 0
-    score += mobility_score(board, player) * 1.25
-    score += corner_score(board, player) * 1.5
-    score += risk_score(board, player) * 0.75
-    score += frontier_score(board, player) * 0.75
-    score += pst_score(board, player) * 1.0
-    score += discs_score(board, player) * 0.1
-    return score
+DEFAULT_WEIGHTS = {
+    "opening": {
+        "mobility": 1.25,
+        "corner": 1.5,
+        "risk": 0.75,
+        "frontier": 0.75,
+        "pst": 1.0,
+        "discs": 0.1,
+    },
+    "midgame": {
+        "mobility": 1.25,
+        "corner": 1.5,
+        "risk": 0.5,
+        "frontier": 1.0,
+        "pst": 1.0,
+        "discs": 0.5,
+    },
+    "endgame": {
+        "mobility": 0.5,
+        "corner": 1.25,
+        "risk": 0.5,
+        "frontier": 0.5,
+        "pst": 0.5,
+        "discs": 1.5,
+    },
+}
 
-def midgame_evaluation(board, player):
-    score = 0
-    score += mobility_score(board, player) * 1.25
-    score += corner_score(board, player) * 1.5
-    score += risk_score(board, player) * 0.5
-    score += frontier_score(board, player) * 1.0
-    score += pst_score(board, player) * 1.0
-    score += discs_score(board, player) * 0.5
-    return score
-
-def endgame_evaluation(board, player):
-    score = 0
-    score += mobility_score(board, player) * 0.5
-    score += corner_score(board, player) * 1.25
-    score += risk_score(board, player) * 0.5
-    score += frontier_score(board, player) * 0.5
-    score += pst_score(board, player) * 0.5
-    score += discs_score(board, player) * 1.5
-    return score
-
-def evaluate(board, player):
+def evaluate(board, player, weights=None):
     phase = game_phase(board)
-    if phase == "opening":
-        return opening_game_evaluation(board, player)
-    elif phase == "midgame":
-        return midgame_evaluation(board, player)
-    else:
-        return endgame_evaluation(board, player)
+    w = (weights or DEFAULT_WEIGHTS).get(phase, DEFAULT_WEIGHTS[phase])
+    score = 0
+    score += mobility_score(board, player) * w["mobility"]
+    score += corner_score(board, player) * w["corner"]
+    score += risk_score(board, player) * w["risk"]
+    score += frontier_score(board, player) * w["frontier"]
+    score += pst_score(board, player) * w["pst"]
+    score += discs_score(board, player) * w["discs"]
+    return score
 
 def mobility_score(board, player):
     player_valid_moves = board.get_valid_moves(player)

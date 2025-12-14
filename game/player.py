@@ -8,8 +8,9 @@ import random
 console = Console()
 
 class Player:
-    def __init__(self, color):
+    def __init__(self, color, name=None):
         self.color = color
+        self.name = name or ("BLUE" if color == BLUE else "PINK")
 
 class HumanPlayer(Player):
     # Gestion des coups valides du joueur humain
@@ -42,19 +43,23 @@ class HumanPlayer(Player):
 
 class AIPlayer(Player):
     # Gestion de l’algorithme de recherche selon la profondeur 
-    def __init__(self, color, depth=4):
-        super().__init__(color)
+    def __init__(self, color, depth=4, name=None, weights=None):
+        super().__init__(color, name=name)
         self.depth = depth
+        self.weights = weights
 
     def get_move(self, board):
         valid_moves = board.get_valid_moves(self.color)
         if not valid_moves:
             return None
-        return choose_move(board, self.color, depth=self.depth)
+        return choose_move(board, self.color, depth=self.depth, weights=self.weights)
     
 
 class RandomAIPlayer(Player):
     # IA qui choisit un coup au hasard parmi les coups valides
+    def __init__(self, color, name=None):
+        super().__init__(color, name=name or "Random")
+
     def get_move(self, board):
         valid_moves = board.get_valid_moves(self.color)
         if not valid_moves:
