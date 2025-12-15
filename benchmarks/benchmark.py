@@ -16,28 +16,14 @@ if PROJECT_ROOT not in sys.path:
 
 from game.board import Board, BLUE, PINK
 from game.player import AIPlayer, RandomAIPlayer
+from ai.ai_profiles import AI_PROFILES
 import ai.minimax as mm
 
 console = Console()
 process = psutil.Process()
 
 # Monkey-patchable node counter
-class NodeCounter:
-    def __init__(self):
-        self.count = 0
-    def reset(self):
-        self.count = 0
-    def inc(self):
-        self.count += 1
-
-NODE_COUNTER = NodeCounter()
-
-# Wrap mm.search to count nodes
 _original_search = mm.search
-
-def counting_search(board, player, depth, alpha=float('-inf'), beta=float('inf')):
-    NODE_COUNTER.inc()
-    return _original_search(board, player, depth, alpha, beta)
 
 # Helper to disable move ordering (baseline)
 _original_quick_eval = mm.quick_eval
@@ -86,43 +72,67 @@ def setup_benchmark():
     console.print("\n[bold cyan]═══════════════════════════════════[/bold cyan]")
     console.print("[bold cyan]     Reversi AI Benchmark Setup[/bold cyan]")
     console.print("[bold cyan]═══════════════════════════════════[/bold cyan]\n")
-    
-    console.print("[yellow]Matchup:[/yellow]")
-    console.print("  1) AI vs AI")
-    console.print("  2) Random vs AI")
-    mode = prompt_int("  Choose (1-2): ", (1, 2), default=1)
-    
-    console.print("\n[yellow]AI Depth:[/yellow]")
-    if mode == 1:
-        depth1 = prompt_int("  BLUE depth (1-5): ", (1, 5), default=4)
-        depth2 = prompt_int("  PINK depth (1-5): ", (1, 5), default=4)
-    else:
-        depth2 = prompt_int("  AI depth (1-5): ", (1, 5), default=4)
-        depth1 = None  # Random AI has no depth
-    
+
+    # Build AI catalog: Random + all profiles
+    catalog = [{
+        'id': 'RANDOM', 'name': 'Random', 'type': 'random', 'weights': None
+    }]
+    for prof in AI_PROFILES:
+        catalog.append({
+            'id': prof['id'], 'name': prof['name'], 'type': 'ai', 'weights': prof['weights']
+        })
+
+    def prompt_ai(side_label: str):
+        console.print(f"\n[yellow]{side_label} selection:[/yellow]")
+        for i, item in enumerate(catalog, start=1):
+            console.print(f"  {i}) {item['name']}")
+        idx = prompt_int("  Choose: ", (1, len(catalog)), default=1)
+        choice = catalog[idx - 1]
+        cfg = {'type': choice['type'], 'name': choice['name'], 'weights': choice['weights']}
+        if choice['type'] == 'ai':
+            cfg['depth'] = prompt_int("  Depth (1-5): ", (1, 5), default=4)
+            cfg['name'] = f"{cfg['name']} (D{cfg['depth']})"
+        return cfg
+
+    p1_cfg = prompt_ai("Player 1 (BLUE)")
+    p2_cfg = prompt_ai("Player 2 (PINK)")
+
     console.print("\n[yellow]Starter:[/yellow]")
-    console.print("  1) BLUE starts")
-    console.print("  2) PINK starts")
+    console.print("  1) P1 starts")
+    console.print("  2) P2 starts")
     console.print("  3) Switch each game (fair)")
     starter = prompt_int("  Choose (1-3): ", (1, 3), default=3)
-    
+
     console.print("\n[yellow]Games:[/yellow]")
     games = prompt_int("  Number of games (1-100): ", (1, 100), default=5)
-    
+
+    console.print("\n[yellow]Performance mode:[/yellow]")
+    console.print("  1) Fast (no memory metrics)")
+    console.print("  2) Full (with memory metrics)")
+    perf_mode = prompt_int("  Choose (1-2): ", (1, 2), default=1)
+
     console.print("\n[dim]Running with current optimization variant...[/dim]\n")
     variant = 1  # Always use current version
-    return mode, depth1, depth2, starter, games, variant
+    return p1_cfg, p2_cfg, starter, games, variant, (perf_mode == 1)
 
 
-def make_players(mode: int, depth1: int | None, depth2: int) -> Tuple:
-    if mode == 1:
-        return AIPlayer(BLUE, depth=depth1), AIPlayer(PINK, depth=depth2)
+def make_players(p1_cfg: Dict, p2_cfg: Dict) -> Tuple:
+    if p1_cfg['type'] == 'random':
+        p1 = RandomAIPlayer(BLUE, name='Random')
     else:
-        return RandomAIPlayer(BLUE), AIPlayer(PINK, depth=depth2)
+        p1 = AIPlayer(BLUE, depth=p1_cfg['depth'], name=p1_cfg['name'], weights=p1_cfg['weights'])
+    if p2_cfg['type'] == 'random':
+        p2 = RandomAIPlayer(PINK, name='Random')
+    else:
+        p2 = AIPlayer(PINK, depth=p2_cfg['depth'], name=p2_cfg['name'], weights=p2_cfg['weights'])
+    return p1, p2
 
 
 def get_player_label(player) -> str:
     """Get a descriptive label for a player."""
+    # Prefer assigned names (include profile + depth if set)
+    if getattr(player, 'name', None):
+        return player.name
     if isinstance(player, AIPlayer):
         return f"AI (d={player.depth})"
     elif isinstance(player, RandomAIPlayer):
@@ -131,10 +141,10 @@ def get_player_label(player) -> str:
         return "Human"
 
 
-def play_one_game(p1, p2, starter: int, variant: int, progress_callback=None) -> Dict:
+def play_one_game(p1, p2, starter: int, variant: int, progress_callback=None, fast_mode: bool = True) -> Dict:
     # variant: 0 baseline (no MO), 1 current
     # Install monkey patches
-    mm.search = counting_search
+    mm.search = _original_search  # keep original for speed
     if variant == 0:
         mm.quick_eval = disable_ordering_quick_eval
     else:
@@ -160,7 +170,8 @@ def play_one_game(p1, p2, starter: int, variant: int, progress_callback=None) ->
         },
     }
 
-    tracemalloc.start()
+    if not fast_mode:
+        tracemalloc.start()
     last_phase = None
     while True:
         valid_current = board.get_valid_moves(current.color)
@@ -176,7 +187,6 @@ def play_one_game(p1, p2, starter: int, variant: int, progress_callback=None) ->
             progress_callback()
         last_phase = phase
         
-        NODE_COUNTER.reset()
         t0 = time.time()
         move = current.get_move(board)
         elapsed_ms = (time.time() - t0) * 1000.0
@@ -186,15 +196,16 @@ def play_one_game(p1, p2, starter: int, variant: int, progress_callback=None) ->
         board.apply_move(move[0], move[1], current.color)
         current, other = other, current
         # memory snapshots
-        rss = process.memory_info().rss
-        cur, peak = tracemalloc.get_traced_memory()
+        if not fast_mode:
+            rss = process.memory_info().rss
+            cur, peak = tracemalloc.get_traced_memory()
         ps = phase_stats[phase]
         ps['moves'] += 1
         ps['time_ms'] += elapsed_ms
-        ps['rss'].append(rss)
-        ps['trace_cur'].append(cur)
-        ps['trace_peak'].append(peak)
-        ps['nodes'] += NODE_COUNTER.count
+        if not fast_mode:
+            ps['rss'].append(rss)
+            ps['trace_cur'].append(cur)
+            ps['trace_peak'].append(peak)
         # Per-player timing
         if current == p1:
             ps['p2_moves'] += 1
@@ -205,7 +216,8 @@ def play_one_game(p1, p2, starter: int, variant: int, progress_callback=None) ->
     # callback for final phase completion
     if progress_callback:
         progress_callback()
-    tracemalloc.stop()
+    if not fast_mode:
+        tracemalloc.stop()
 
     # result
     b, w = board.count_discs()
@@ -218,19 +230,12 @@ def play_one_game(p1, p2, starter: int, variant: int, progress_callback=None) ->
     }
 
 
-def aggregate(results: List[Dict], mode: int, starter_mode: int, variant: int, games: int, depth1: int | None, depth2: int):
-    # who vs who
-    who = 'AI vs AI' if mode == 1 else 'Random vs AI'
-    starter_label = {1: 'BLUE', 2: 'PINK', 3: 'Switch'}[starter_mode]
-    # Build depth string
-    if mode == 1:
-        depth_str = f"d={depth1} vs d={depth2}"
-    else:
-        depth_str = f"d={depth2}"
-    
+def aggregate(results: List[Dict], starter_mode: int, variant: int, games: int, fast_mode: bool):
     # Get player labels from first result
     p1_label = get_player_label(results[0]['p1']) if results else "P1"
     p2_label = get_player_label(results[0]['p2']) if results else "P2"
+    who = f"{p1_label} vs {p2_label}"
+    starter_label = {1: p1_label, 2: p2_label, 3: 'Switch'}[starter_mode]
     
     # Count wins
     wins = {'BLUE': 0, 'PINK': 0, 'TIE': 0}
@@ -246,10 +251,10 @@ def aggregate(results: List[Dict], mode: int, starter_mode: int, variant: int, g
     for phase in ('opening', 'midgame', 'endgame'):
         moves = sum(r['phase_stats'][phase]['moves'] for r in results)
         time_ms = sum(r['phase_stats'][phase]['time_ms'] for r in results)
-        rss_all = [x for r in results for x in r['phase_stats'][phase]['rss']]
-        cur_all = [x for r in results for x in r['phase_stats'][phase]['trace_cur']]
-        peak_all = [x for r in results for x in r['phase_stats'][phase]['trace_peak']]
-        nodes = sum(r['phase_stats'][phase]['nodes'] for r in results)
+        rss_all = [x for r in results for x in r['phase_stats'][phase]['rss']] if not fast_mode else []
+        cur_all = [x for r in results for x in r['phase_stats'][phase]['trace_cur']] if not fast_mode else []
+        peak_all = [x for r in results for x in r['phase_stats'][phase]['trace_peak']] if not fast_mode else []
+        nodes = 0
         
         # Per-player stats
         p1_moves = sum(r['phase_stats'][phase]['p1_moves'] for r in results)
@@ -261,9 +266,9 @@ def aggregate(results: List[Dict], mode: int, starter_mode: int, variant: int, g
         p1_avg_time = (p1_time_ms / p1_moves) if p1_moves else 0.0
         p2_avg_time = (p2_time_ms / p2_moves) if p2_moves else 0.0
         
-        mean_rss = (sum(rss_all) / len(rss_all)) if rss_all else 0.0
-        mean_trace_cur = (sum(cur_all) / len(cur_all)) if cur_all else 0.0
-        mean_trace_peak = (sum(peak_all) / len(peak_all)) if peak_all else 0.0
+        mean_rss = (sum(rss_all) / len(rss_all)) if rss_all else None
+        mean_trace_cur = (sum(cur_all) / len(cur_all)) if cur_all else None
+        mean_trace_peak = (sum(peak_all) / len(peak_all)) if peak_all else None
         agg[phase] = {
             'moves': moves,
             'avg_time_ms': avg_time_per_move,
@@ -286,9 +291,10 @@ def aggregate(results: List[Dict], mode: int, starter_mode: int, variant: int, g
         t.add_column(f"{p1_label} % Win", justify="right")
         t.add_column(f"{p2_label} % Win", justify="right")
         t.add_column("Draw %", justify="right")
-        t.add_column("Mean RSS", justify="right")
-        t.add_column("Mean tracemalloc cur", justify="right")
-        t.add_column("Mean tracemalloc peak", justify="right")
+        if not fast_mode:
+            t.add_column("Mean RSS", justify="right")
+            t.add_column("Mean tracemalloc cur", justify="right")
+            t.add_column("Mean tracemalloc peak", justify="right")
         data = agg[phase]
         if phase == 'endgame':
             win_p1 = f"{win_rate_p1:.1f}"
@@ -298,24 +304,28 @@ def aggregate(results: List[Dict], mode: int, starter_mode: int, variant: int, g
             win_p1 = "-"
             win_p2 = "-"
             win_draw = "-"
-        t.add_row(
-            f"{who} ({depth_str})",
+        row_vals = [
+            f"{who}",
             starter_label,
             f"{data['p1_avg_time_ms']:.2f}",
             f"{data['p2_avg_time_ms']:.2f}",
             win_p1,
             win_p2,
             win_draw,
-            format_bytes(int(data['mean_rss'])),
-            format_bytes(int(data['mean_trace_cur'])),
-            format_bytes(int(data['mean_trace_peak'])),
-        )
+        ]
+        if not fast_mode:
+            row_vals.extend([
+                format_bytes(int(data['mean_rss'])) if data['mean_rss'] is not None else "-",
+                format_bytes(int(data['mean_trace_cur'])) if data['mean_trace_cur'] is not None else "-",
+                format_bytes(int(data['mean_trace_peak'])) if data['mean_trace_peak'] is not None else "-",
+            ])
+        t.add_row(*row_vals)
         tables[phase] = t
     return tables
 
 
 def main():
-    mode, depth1, depth2, starter_mode, games, variant = setup_benchmark()
+    p1_cfg, p2_cfg, starter_mode, games, variant, fast_mode = setup_benchmark()
     # switching logic with phase-level progress
     results = []
     # Total phases: 3 per game (opening, midgame, endgame)
@@ -334,13 +344,13 @@ def main():
                 starter = 1 if (i % 2 == 0) else 2
             else:
                 starter = starter_mode
-            p1, p2 = make_players(mode, depth1, depth2)
+            p1, p2 = make_players(p1_cfg, p2_cfg)
             # Pass a callback that advances progress bar per phase
             def phase_done():
                 progress.advance(task, 1)
-            res = play_one_game(p1, p2, starter, variant, progress_callback=phase_done)
+            res = play_one_game(p1, p2, starter, variant, progress_callback=phase_done, fast_mode=fast_mode)
             results.append(res)
-    tables = aggregate(results, mode, starter_mode, variant, games, depth1, depth2)
+    tables = aggregate(results, starter_mode, variant, games, fast_mode)
     for phase in ('opening', 'midgame', 'endgame'):
         console.print(tables[phase])
 

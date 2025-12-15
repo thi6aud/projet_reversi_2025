@@ -55,6 +55,105 @@ STRATEGY_BETTER_DEFAULT = {
     },
 }
 
+# Mobility-oriented but balanced profile
+STRATEGY_BALANCED_MOBILITY = {
+    "opening": {
+        "mobility": 4.0,
+        "corner": 1.8,
+        "risk": 1.2,
+        "frontier": 0.8,
+        "pst": 2.0,
+        "discs": 0.1,
+    },
+    "midgame": {
+        "mobility": 4.5,
+        "corner": 1.8,
+        "risk": 1.0,
+        "frontier": 1.0,
+        "pst": 2.0,
+        "discs": 0.5,
+    },
+    "endgame": {
+        "mobility": 0.5,
+        "corner": 1.8,
+        "risk": 0.5,
+        "frontier": 0.5,
+        "pst": 0.7,
+        "discs": 2.5,
+    },
+}
+
+# Mobility focus with strong endgame discs/corners
+STRATEGY_MOBILITY_ENDGAME = {
+    "opening": {
+        "mobility": 4.0,
+        "corner": 1.7,
+        "risk": 1.1,
+        "frontier": 0.8,
+        "pst": 2.0,
+        "discs": 0.1,
+    },
+    "midgame": {
+        "mobility": 4.5,
+        "corner": 1.7,
+        "risk": 1.0,
+        "frontier": 1.0,
+        "pst": 2.0,
+        "discs": 0.5,
+    },
+    "endgame": {
+        "mobility": 0.5,
+        "corner": 2.0,
+        "risk": 0.5,
+        "frontier": 0.5,
+        "pst": 1.0,
+        "discs": 4.0,
+    },
+}
+
+# Godlike: stronger corners/stability, lower risk, added advanced signals
+STRATEGY_GODLIKE = {
+    "opening": {
+        "mobility": 4.5,
+        "corner": 3.4,
+        "risk": 0.9,
+        "frontier": 0.5,
+        "pst": 2.5,
+        "discs": 0.4,
+        "potential_mobility": 0.8,
+        "corner_access": 3.0,
+        "x_c_penalty": 2.0,
+        "stability": 2.0,
+        "parity": 0.0,
+    },
+    "midgame": {
+        "mobility": 5.2,
+        "corner": 3.8,
+        "risk": 0.9,
+        "frontier": 1.0,
+        "pst": 2.7,
+        "discs": 0.8,
+        "potential_mobility": 1.0,
+        "corner_access": 3.0,
+        "x_c_penalty": 2.0,
+        "stability": 3.0,
+        "parity": 0.0,
+    },
+    "endgame": {
+        "mobility": 0.9,
+        "corner": 3.8,
+        "risk": 0.5,
+        "frontier": 0.5,
+        "pst": 1.4,
+        "discs": 4.8,
+        "potential_mobility": 0.5,
+        "corner_access": 1.0,
+        "x_c_penalty": 0.5,
+        "stability": 5.0,
+        "parity": 1.0,
+    },
+}
+
 # Defensive: minimize risky exposures near empty corners
 STRATEGY_DEFENSE = {
     "opening": {
@@ -131,6 +230,30 @@ AI_PROFILES = [
         "name": "IA optimisée",
         "description": "Poids optimisés par recherche",
         "weights": STRATEGY_BETTER_DEFAULT,
+    },
+    {
+        "id": "BALANCED_MOBILITY",
+        "name": "Mobilité équilibrée",
+        "description": "Mobilité forte avec équilibrage coins/risque",
+        "weights": STRATEGY_BALANCED_MOBILITY,
+    },
+    {
+        "id": "MOBILITY_ENDGAME",
+        "name": "Mobilité fin de partie",
+        "description": "Mobilité élevée, fin de partie discs/coins renforcés",
+        "weights": STRATEGY_MOBILITY_ENDGAME,
+    },
+    {
+        "id": "GODLIKE",
+        "name": "Godlike",
+        "description": "Coins forts, mobilité max, fin de partie discs",
+        "weights": STRATEGY_GODLIKE,
+    },
+    {
+        "id": "GODLIKE_V2",
+        "name": "Godlike v2",
+        "description": "Coins/stabilité renforcés, pénalités X/C, parité",
+        "weights": STRATEGY_GODLIKE_V2,
     },
     {
         "id": "DEFENSE",
