@@ -28,49 +28,6 @@ STRATEGY_DEFAULT = {
 }
 
 
-# Godlike: stronger corners/stability, lower risk, added advanced signals
-STRATEGY_GODLIKE = {
-    "opening": {
-        "mobility": 4.5,
-        "corner": 3.5,
-        "risk": 1,
-        "frontier": 0.5,
-        "pst": 2.5,
-        "discs": 0.5,
-        "potential_mobility": 1,
-        "corner_access": 3.0,
-        "x_c_penalty": 2.0,
-        "stability": 2.0,
-        "parity": 0.0,
-    },
-    "midgame": {
-        "mobility": 5.0,
-        "corner": 4.0,
-        "risk": 1.0,
-        "frontier": 1.0,
-        "pst": 3.0,
-        "discs": 1.0,
-        "potential_mobility": 1.0,
-        "corner_access": 3.0,
-        "x_c_penalty": 2.0,
-        "stability": 3.0,
-        "parity": 0.0,
-    },
-    "endgame": {
-        "mobility": 1.0,
-        "corner": 4.0,
-        "risk": 0.5,
-        "frontier": 0.5,
-        "pst": 1.5,
-        "discs": 5.0,
-        "potential_mobility": 0.5,
-        "corner_access": 1.0,
-        "x_c_penalty": 0.5,
-        "stability": 5.0,
-        "parity": 1.0,
-    },
-}
-
 # Defensive: minimize risky exposures near empty corners
 STRATEGY_DEFENSE = {
     "opening": {
@@ -141,18 +98,6 @@ AI_PROFILES = [
         "name": "IA par défaut",
         "description": "Profil standard équilibré",
         "weights": STRATEGY_DEFAULT,
-    },
-    {
-        "id": "BETTER_DEFAULT",
-        "name": "IA optimisée",
-        "description": "Poids optimisés par recherche",
-        "weights": STRATEGY_BETTER_DEFAULT,
-    },
-    {
-        "id": "GODLIKE",
-        "name": "Godlike",
-        "description": "Coins forts, mobilité max, fin de partie discs",
-        "weights": STRATEGY_GODLIKE,
     },
     {
         "id": "DEFENSE",

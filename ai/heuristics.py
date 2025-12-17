@@ -48,12 +48,6 @@ def evaluate(board, player, weights=None):
     score += frontier_score(board, player) * w.get("frontier", 0)
     score += pst_score(board, player) * w.get("pst", 0)
     score += discs_score(board, player) * w.get("discs", 0)
-    # Optional advanced signals (default to 0 if not provided)
-    score += potential_mobility_score(board, player) * w.get("potential_mobility", 0)
-    score += corner_access_score(board, player) * w.get("corner_access", 0)
-    score += x_c_penalty_score(board, player) * w.get("x_c_penalty", 0)
-    score += edge_stability_score(board, player) * w.get("stability", 0)
-    score += parity_score(board) * w.get("parity", 0)
     return score
 
 def mobility_score(board, player):
