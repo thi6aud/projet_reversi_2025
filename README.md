@@ -137,9 +137,11 @@ Lancez le jeu avec :
 python main.py
 ```
 Suivez les instructions dans le terminal pour choisir le mode de jeu :
-- Humain vs Humain
-- Humain vs IA
-- IA vs IA
+- Human vs Human
+- Human vs AI
+- IA random vs Human
+- IA random vs AI
+- AI vs AI
 
 ## Structure du projet
 
