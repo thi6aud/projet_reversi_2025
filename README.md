@@ -1,33 +1,43 @@
 
-Petit projet Reversi (Othello) en Python — console + UI minimale. Le but est d'avoir un jeu jouable en terminal, une IA (minimax) et des utilitaires pour jouer / tester.
+# Reversi 2025
 
-## 🧭 Structure du dépôt
+Ce projet est une implémentation du jeu Reversi en Python, avec une interface console et une IA basée sur Minimax.
 
-- `main.py` — lanceur du jeu
-- `game/` — logique du jeu (plateau, gestion, joueurs)
-- `ai/` — algorithme IA, heuristiques
-- `ui/` — interfaces utilisateur (console, pygame)
-- `tests/` — tests unitaires (pytest)
+## Installation
 
-## ⚙️ Prérequis
+1. Clonez le dépôt :
+   ```sh
+   git clone https://github.com/thi6aud/projet_reversi_2025.git
+   cd projet_reversi_2025
+   ```
+2. Installez les dépendances :
+   ```sh
+   pip install -r requirements.txt
+   ```
 
-Ce projet utilise la bibliothèque `rich` pour un rendu terminal amélioré.
+## Utilisation
 
-Installer les dépendances (recommandé dans un environnement virtuel) :
-
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
-
-> Si tu veux utiliser l'UI pygame, installe `pygame` et active la UI correspondante (optionnel, mentionné en commentaire dans `requirements.txt`).
-
-## ▶️ Lancer le jeu
-
-```bash
+Lancez le jeu avec :
+```sh
 python main.py
 ```
+Suivez les instructions dans le terminal pour choisir le mode de jeu :
+- Humain vs Humain
+- Humain vs IA
+- IA vs IA
 
-Le jeu te demandera le mode (humain vs humain, humain vs IA, IA vs IA, profondeur de l'IA, ...). Les coups au terminal s'expriment au format `D3` (colonne lettre A–H + ligne 1–8).
+## Structure du projet
 
+- `main.py` : point d’entrée du jeu
+- `game/` : logique du jeu (plateau, joueurs, gestion)
+- `ai/` : intelligence artificielle (minimax, heuristiques)
+- `ui/` : interfaces utilisateur (console, pygame)
+- `tests/` : tests unitaires
+
+## Auteurs
+
+Arsil Ibrahim Saleh, Mahdjoub Amélia, Delucinge Thibaud
+
+## Licence
+
+MIASHS
