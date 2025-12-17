@@ -34,7 +34,8 @@ def disable_ordering_quick_eval(*args, **kwargs):
 
 
 def get_phase(board: Board) -> str:
-    return mm.get_game_phase(board)
+    from ai.heuristics import game_phase
+    return game_phase(board)
 
 
 def format_bytes(bytes_val: int) -> str:
