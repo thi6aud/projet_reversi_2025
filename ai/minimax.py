@@ -137,8 +137,7 @@ def quick_eval(move, board=None, player=None):
         score -= 500
 
     # 3. Bonus pour les bords (X-squares) - bonne stabilité
-    edges = [(i, j) for i in range(8) for j in range(8) 
-             if i in (0, 7) or j in (0, 7)]
+    edges = [(i, j) for i in range(8) for j in range(8) if i in (0, 7) or j in (0, 7)]
     if (row_idx, col) in edges and (row_idx, col) not in corners and (row_idx, col) not in dangerous:
         score += 50
 
