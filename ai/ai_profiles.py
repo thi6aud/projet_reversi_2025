@@ -27,34 +27,6 @@ STRATEGY_DEFAULT = {
     },
 }
 
-# Optimized strategy with improved weights
-STRATEGY_BETTER_DEFAULT = {
-    "opening": {
-        "mobility": 1.642,
-        "corner": 0.394,
-        "risk": 0.481,
-        "frontier": 1.426,
-        "pst": 1.296,
-        "discs": 3.881,
-    },
-    "midgame": {
-        "mobility": 0.133,
-        "corner": 0.425,
-        "risk": 0.064,
-        "frontier": 0.849,
-        "pst": 1.895,
-        "discs": 1.533,
-    },
-    "endgame": {
-        "mobility": 1.539,
-        "corner": 0.361,
-        "risk": 0.228,
-        "frontier": 0.256,
-        "pst": 1.807,
-        "discs": 0.401,
-    },
-}
-
 
 # Godlike: stronger corners/stability, lower risk, added advanced signals
 STRATEGY_GODLIKE = {
