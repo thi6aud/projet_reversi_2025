@@ -177,28 +177,10 @@ AI_PROFILES = [
         "weights": STRATEGY_BETTER_DEFAULT,
     },
     {
-        "id": "BALANCED_MOBILITY",
-        "name": "Mobilité équilibrée",
-        "description": "Mobilité forte avec équilibrage coins/risque",
-        "weights": STRATEGY_BALANCED_MOBILITY,
-    },
-    {
-        "id": "MOBILITY_ENDGAME",
-        "name": "Mobilité fin de partie",
-        "description": "Mobilité élevée, fin de partie discs/coins renforcés",
-        "weights": STRATEGY_MOBILITY_ENDGAME,
-    },
-    {
         "id": "GODLIKE",
         "name": "Godlike",
         "description": "Coins forts, mobilité max, fin de partie discs",
         "weights": STRATEGY_GODLIKE,
-    },
-    {
-        "id": "GODLIKE_V2",
-        "name": "Godlike v2",
-        "description": "Coins/stabilité renforcés, pénalités X/C, parité",
-        "weights": STRATEGY_GODLIKE_V2,
     },
     {
         "id": "DEFENSE",
