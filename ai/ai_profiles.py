@@ -2,28 +2,16 @@
 # Base/default strategy
 STRATEGY_DEFAULT = {
     "opening": {
-        "mobility": 1.25,
-        "corner": 1.5,
-        "risk": 0.75,
-        "frontier": 0.75,
-        "pst": 1.0,
-        "discs": 0.1,
+        "mobility": 1.25, "corner": 1.5, "risk": 0.75,
+        "frontier": 0.75,"pst": 1.0, "discs": 0.1,
     },
     "midgame": {
-        "mobility": 1.25,
-        "corner": 1.5,
-        "risk": 0.5,
-        "frontier": 1.0,
-        "pst": 1.0,
-        "discs": 0.5,
+        "mobility": 1.25, "corner": 1.5,"risk": 0.5,
+        "frontier": 1.0,"pst": 1.0,"discs": 0.5,
     },
     "endgame": {
-        "mobility": 0.5,
-        "corner": 1.25,
-        "risk": 0.5,
-        "frontier": 0.5,
-        "pst": 0.5,
-        "discs": 1.5,
+        "mobility": 0.5, "corner": 1.25, "risk": 0.5,
+        "frontier": 0.5,"pst": 0.5,"discs": 1.5,
     },
 }
 
