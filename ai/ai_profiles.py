@@ -55,61 +55,6 @@ STRATEGY_BETTER_DEFAULT = {
     },
 }
 
-# Mobility-oriented but balanced profile
-STRATEGY_BALANCED_MOBILITY = {
-    "opening": {
-        "mobility": 4.0,
-        "corner": 1.8,
-        "risk": 1.2,
-        "frontier": 0.8,
-        "pst": 2.0,
-        "discs": 0.1,
-    },
-    "midgame": {
-        "mobility": 4.5,
-        "corner": 1.8,
-        "risk": 1.0,
-        "frontier": 1.0,
-        "pst": 2.0,
-        "discs": 0.5,
-    },
-    "endgame": {
-        "mobility": 0.5,
-        "corner": 1.8,
-        "risk": 0.5,
-        "frontier": 0.5,
-        "pst": 0.7,
-        "discs": 2.5,
-    },
-}
-
-# Mobility focus with strong endgame discs/corners
-STRATEGY_MOBILITY_ENDGAME = {
-    "opening": {
-        "mobility": 4.0,
-        "corner": 1.7,
-        "risk": 1.1,
-        "frontier": 0.8,
-        "pst": 2.0,
-        "discs": 0.1,
-    },
-    "midgame": {
-        "mobility": 4.5,
-        "corner": 1.7,
-        "risk": 1.0,
-        "frontier": 1.0,
-        "pst": 2.0,
-        "discs": 0.5,
-    },
-    "endgame": {
-        "mobility": 0.5,
-        "corner": 2.0,
-        "risk": 0.5,
-        "frontier": 0.5,
-        "pst": 1.0,
-        "discs": 4.0,
-    },
-}
 
 # Godlike: stronger corners/stability, lower risk, added advanced signals
 STRATEGY_GODLIKE = {
