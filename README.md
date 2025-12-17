@@ -23,8 +23,10 @@ python main.py
 ```
 Suivez les instructions dans le terminal pour choisir le mode de jeu :
 - Humain vs Humain
-- Humain vs IA
-- IA vs IA
+— Humain vs IA
+— IA random vs Human
+— IA random vs IA
+— IA vs IA
 
 ## Structure du projet
 
